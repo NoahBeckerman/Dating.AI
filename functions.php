@@ -1,7 +1,6 @@
 <?php
 require_once 'config.php';
 require_once 'database.php';
-require_once 'openai.php';
 /**
  * Execute a database query.
  *
@@ -184,6 +183,9 @@ function storeChatRecord($userId, $personalityId, $message, $response) {
               VALUES (?, ?, ?, ?)";
     executeNonQuery($query, [$userId, $personalityId, $message, $response]);
 }
+
+
+
 /**
  * Send a message to the AI and get the response.
  *
@@ -192,15 +194,11 @@ function storeChatRecord($userId, $personalityId, $message, $response) {
  * @return string The AI response.
  */
 function sendMessage($message, $personalityId) {
-    // TODO: Implement the logic to send the message to the AI and get the response
-    // Use the $message and $personalityId parameters to customize the AI response
-    // Return the AI response as a string
-    // Example code using OpenAI API:
-    // $response = openaiApiCall($message, $personalityId);
-    // return $response;
     $personality = getPersonalityById($personalityId);
     $prompt = $personality['description'] . "\nUser: " . $message;
-    return openaiApiCall($prompt);
+    $response = openaiApiCall($prompt);
+    storeChatRecord($userId, $personalityId, $message, $response);
+    return $response;
 }
 /**
  * Get a personality by ID.
@@ -213,5 +211,31 @@ function getPersonalityById($personalityId) {
     $result = executeQuery($query, [$personalityId]);
     return $result[0] ?? null;
 }
+function openaiApiCall($prompt) {
+    $api_key = OPENAI_API_KEY;
+    $engine = ENGINE_NAME;
+    $url = "https://api.openai.com/v1/engines/$engine/completions";
+
+    $data = json_encode([
+        'prompt' => $prompt,
+        'max_tokens' => 100
+    ]);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Content-Type: application/json",
+        "Authorization: Bearer $api_key"
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $response_data = json_decode($response, true);
+    return $response_data['choices'][0]['text'];
+}
+
 // Call the createDatabase function to create the database, tables, and test data
 createDatabase();
