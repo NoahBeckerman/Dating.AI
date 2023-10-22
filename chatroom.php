@@ -5,18 +5,26 @@ require_once 'functions.php';
 if (!isLoggedIn()) {
     redirect('login.php');
 }
+
+// Get the selected personality ID from URL or session
+$personalityId = isset($_GET['personalityId']) ? $_GET['personalityId'] : $_SESSION['selected_personality_id'];
+
+// If no personality ID is found, redirect to lobby
+if (!$personalityId) {
+    redirect('lobby.php');
+}
+
 // Handle form submission for sending messages
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve the form data
     $message = $_POST['message'];
-    // Get the selected personality ID
-    $personalityId = $_SESSION['selected_personality_id'];
     // Send the message and get the response
     $response = sendMessage($message, $personalityId);
     // Store the chat record in the database
     $userId = $_SESSION['user_id'];
     storeChatRecord($userId, $personalityId, $message, $response);
 }
+
 // Display the chatroom page content
 ?>
 <!DOCTYPE html>
@@ -37,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $userId = $_SESSION['user_id'];
                 $previousChats = getPreviousChats($userId);
                 foreach ($previousChats as $chat) {
-                    echo '<li><a href="#" onclick="selectPersonality(' . $chat['personality_id'] . ')">' . $chat['first_name'] . ' ' . $chat['last_name'] . '</a></li>';
+                    echo '<li><a href="chatroom.php?personalityId=' . $chat['personality_id'] . '">' . $chat['first_name'] . ' ' . $chat['last_name'] . '</a></li>';
                 }
                 ?>
             </ul>
@@ -47,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="chat-messages">
                 <?php
                 // Display the chat messages here
-                $personalityId = $_SESSION['selected_personality_id'];
                 $chatMessages = getChatMessages($userId, $personalityId);
                 foreach ($chatMessages as $message) {
                     echo '<div class="chat-message">' . $message['message'] . '</div>';
