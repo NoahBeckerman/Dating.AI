@@ -31,7 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" id="password" name="password" required><br>
             <input type="submit" value="Sign In">
         </form>
+        <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
     </main>
+
+
+
+    
     <?php include 'footer.php'; ?> <!-- Include the footer -->
 </body>
 </html>
