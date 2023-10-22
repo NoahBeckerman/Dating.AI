@@ -64,57 +64,15 @@ function logout() {
 /**
  * Create the database, tables, and test data if they do not exist.
  */
-function createDatabase() {
+function importDatabase() {
     global $database;
-    // Create the database if it does not exist
-    $query = "CREATE DATABASE IF NOT EXISTS " . DB_NAME;
-    executeNonQuery($query, [], false);
-    // Select the database
-    $database->getConnection()->select_db(DB_NAME);
-    // Create the users table if it does not exist
-    $query = "CREATE TABLE IF NOT EXISTS users (
-        id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(255) NOT NULL,
-        username VARCHAR(255) NOT NULL,
-        password VARCHAR(255) NOT NULL
-    )";
-    executeNonQuery($query, [], false);
-    // Create the personalities table if it does not exist
-    $query = "CREATE TABLE IF NOT EXISTS personalities (
-        id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        first_name VARCHAR(255) NOT NULL,
-        last_name VARCHAR(255) NOT NULL,
-        profile_picture VARCHAR(255),
-        description TEXT,
-        notes TEXT,
-        likes TEXT,
-        dislikes TEXT,
-        sex ENUM('male', 'female'),
-        location VARCHAR(255)
-    )";
-    executeNonQuery($query, [], false);
-    // Create the chat history table if it does not exist
-    $query = "CREATE TABLE IF NOT EXISTS chat_history (
-        id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        user_id INT(11) UNSIGNED NOT NULL,
-        personality_id INT(11) UNSIGNED NOT NULL,
-        message TEXT NOT NULL,
-        response TEXT NOT NULL,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (personality_id) REFERENCES personalities(id)
-    )";
-    executeNonQuery($query, [], false);
-    // Insert test data into the users table if it is empty
-    $query = "SELECT COUNT(*) FROM users";
+    // Check if the database exists
+    $query = "SHOW DATABASES LIKE '" . DB_NAME . "'";
     $result = executeQuery($query);
-    $row = $result[0];
-    if ($row['COUNT(*)'] == 0) {
-        $query = "INSERT INTO users (email, username, password) VALUES
-            ('test1@example.com', 'test1', 'password1'),
-            ('test2@example.com', 'test2', 'password2'),
-            ('test3@example.com', 'test3', 'password3')";
-        executeNonQuery($query, [], false);
+    if (count($result) == 0) {
+        // Import the database from database.sql
+        $sql = file_get_contents('database.sql');
+        $database->getConnection()->multi_query($sql);
     }
 }
 
