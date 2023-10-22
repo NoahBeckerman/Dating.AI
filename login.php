@@ -12,12 +12,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     userLogin($usernameOrEmail, $password);
 }
 
-if (isset($_SESSION['response_type']) && $_SESSION['response_type'] === 'error') {
-    echo "<p class='error-message'>" . $_SESSION['response_data'] . "</p>";
-    unset($_SESSION['response_type']);
-    unset($_SESSION['response_data']);
-}
 
+if (!empty($errors)) {
+    echo '<script>';
+    foreach ($errors as $error) {
+        echo "document.getElementById('errorPopupText').textContent = '{$error['message']}';
+              document.getElementById('errorPopup').classList.toggle('show');";
+    }
+    echo '</script>';
+}
 
 // Display the login page content
 ?>
@@ -47,10 +50,9 @@ if (isset($_SESSION['response_type']) && $_SESSION['response_type'] === 'error')
         </form>
         <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
     </main>
-
-
-
-    
+    <?php include 'modal.php'; ?>
     <?php include 'footer.php'; ?> <!-- Include the footer -->
 </body>
 </html>
+
+

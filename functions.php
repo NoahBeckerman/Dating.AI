@@ -1,8 +1,8 @@
 <?php
 require_once 'config.php';
 require_once 'database.php';
-require_once 'modal.php';
-require_once 'display_message.php'; 
+
+
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -190,24 +190,28 @@ function getPersonalityById($personalityId) {
 function userLogin($usernameOrEmail, $password) {
     $user = getUserByUsernameOrEmail($usernameOrEmail);
     if ($user && password_verify($password, $user['password'])) {
-        session_start();
         $_SESSION['user_id'] = $user['id'];
-        handleResponse('SUCCESS', 'Valid Credentials Provided.',  'Redirecting you now...');
         header("Location: index.php");
         exit();
     } else {
-        handleResponse('ERROR', 'InvalidCredentials', 'Invalid username or password.');
-       
-        exit();
+        addError('InvalidCredentials', 'Invalid username or password.');
+
     }
 }
 
-// Generic function for handling messages
-function handleResponse($responseType, $responseTitle, $responseData) {
-    $_SESSION['response_type'] = $responseType;
-    $_SESSION['response_title'] = $responseTitle;
-    $_SESSION['response_data'] = $responseData;
+// Generic function for error messages
+
+$errors = [];
+
+function addError($errorTitle, $errorMessage) {
+    global $errors;
+    $errors[] = [
+        'title' => $errorTitle,
+        'message' => $errorMessage
+    ];
 }
+
+
 
 
 /**
