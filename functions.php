@@ -192,18 +192,21 @@ function userLogin($usernameOrEmail, $password) {
         $_SESSION['user_id'] = $user['id'];
         redirect('index.php');
     } else {
-        handleInvalidCredentials();
+        handleInvalidCredentials('Invalid Username/Email, and/or password.');
     }
 }
 
 // New function for handling invalid credentials
-function handleInvalidCredentials() {
-    displayErrorMessage("Invalid username or password.");
+function handleInvalidCredentials($message) {
+    displayErrorMessage($message);
 }
 
 // New function for displaying error messages
 function displayErrorMessage($message) {
-    echo "<div class='error-message-invalid-login'>$message</div>";
+    echo "<script>
+            $('#responseModalBody').html('$message');
+            $('#responseModal').modal('show');
+          </script>";
 }
 
 /**
