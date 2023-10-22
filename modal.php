@@ -43,15 +43,18 @@
 </style>
 
 
-
+<!-- The popup container -->
 <div class="popup" id="messagePopup">
-  <div class="popuptext bg-dark text-white p-4 rounded shadow-lg">
-    <div class="popup-header">
-      <div class="popup-type" id="messagePopupType"></div>
-      <div class="popup-title" id="messagePopupTitle"></div>
-      <span class="popup-close text-white" onclick="closePopup()">x</span>
+  <!-- The popup content -->
+  <div class="popuptext bg-dark text-white p-4 rounded shadow-lg" style="border-top: 3px solid red;">
+    <!-- Header with title and close button -->
+    <div class="d-flex justify-content-between align-items-center">
+      <div id="messagePopupTitle" class="font-weight-bold"></div>
+      <span class="text-white" onclick="closePopup()">x</span>
     </div>
-    <div class="popup-message" id="messagePopupText"></div>
+    <!-- Message content -->
+    <div class="text-center my-3" id="messagePopupText"></div>
+    <!-- Acknowledge button -->
     <button class="btn btn-success mt-2 float-right" onclick="closePopup()">Acknowledge</button>
   </div>
 </div>
@@ -82,22 +85,22 @@ function setColorBasedOnType(type) {
     }
     document.getElementById('messagePopupType').style.borderTopColor = color;
 }
-
 </script>
 
-
 <?php
+// Check if there are any flags to display
 if (!empty($flags)) {
     echo '<script>';
     echo 'document.addEventListener("DOMContentLoaded", function() {';
+    // Loop through each flag
     foreach ($flags as $flag) {
+        // Only display the flag if it's user-facing
         if ($flag['userfacing'] == 1) {
             echo "document.getElementById('messagePopupTitle').textContent = '{$flag['title']}';
                   document.getElementById('messagePopupText').textContent = '{$flag['message']}';
-                  document.getElementById('messagePopupType').textContent = '{$flag['type']}';
-                  document.getElementById('messagePopup').classList.add('show');
-                  setColorBasedOnType('{$flag['type']}');";
+                  document.getElementById('messagePopup').classList.add('show');";
         } else {
+            // Log non-user-facing flags to the console
             echo "console.log('{$flag['type']}: {$flag['title']} - {$flag['message']}');";
         }
     }
@@ -105,6 +108,8 @@ if (!empty($flags)) {
     echo '</script>';
 }
 ?>
+
+
 
 
 

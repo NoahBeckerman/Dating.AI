@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     userLogin($usernameOrEmail, $password);
 }
-var_dump($flags);
 
 // Display the login page content
 ?>
