@@ -194,20 +194,22 @@ function userLogin($usernameOrEmail, $password) {
         header("Location: index.php");
         exit();
     } else {
-        addError('InvalidCredentials', 'Invalid username or password.');
+        SystemFlag('Invalid Credentials', 'Invalid username or password.' , 'ERROR', 1);
 
     }
 }
 
-// Generic function for error messages
+// Generic SystemFlag for error messages and others.
 
-$errors = [];
+$flags = [];
 
-function addError($errorTitle, $errorMessage) {
-    global $errors;
-    $errors[] = [
-        'title' => $errorTitle,
-        'message' => $errorMessage
+function SystemFlag($MessageTitle, $SystemMessage, $Message_Type, $UserFacing) {
+    global $flags;
+    $flags[] = [
+        'title' => $MessageTitle,
+        'message' => $SystemMessage,
+        'type' => $Message_Type,
+        'userfacing' => $UserFacing
     ];
 }
 

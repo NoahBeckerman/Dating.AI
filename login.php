@@ -11,16 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     userLogin($usernameOrEmail, $password);
 }
-
-
-if (!empty($errors)) {
-    echo '<script>';
-    foreach ($errors as $error) {
-        echo "document.getElementById('errorPopupText').textContent = '{$error['message']}';
-              document.getElementById('errorPopup').classList.toggle('show');";
-    }
-    echo '</script>';
-}
+var_dump($flags);
 
 // Display the login page content
 ?>
@@ -54,5 +45,4 @@ if (!empty($errors)) {
     <?php include 'footer.php'; ?> <!-- Include the footer -->
 </body>
 </html>
-
 
