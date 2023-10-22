@@ -7,4 +7,5 @@ define('DB_NAME', 'your_database_name');
 
 define('OPENAI_API_KEY', 'api_key');
 define('ENGINE_NAME', 'YOUR_ENGINE_NAME');
-
+define('MAX_TOKES', 4096)
+define('TEMPERATURE', 0.7)
