@@ -11,6 +11,8 @@ if (!isLoggedIn()) {
 <head>
     <title>Dating.AI - Lobby</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="functions.js"></script>
+
 </head>
 <body>
     <?php include 'header.php'; ?> <!-- Include the header -->

@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'database.php';
+require_once 'openai.php';
 /**
  * Execute a database query.
  *
@@ -214,13 +215,16 @@ function getPersonalityById($personalityId) {
 function openaiApiCall($prompt) {
     $api_key = OPENAI_API_KEY;
     $engine = ENGINE_NAME;
+    $max_tokens = MAX_TOKENS;  // Retrieve max tokens from config.php
+    $temperature = TEMPERATURE;  // Retrieve temperature from config.php
     $url = "https://api.openai.com/v1/engines/$engine/completions";
 
     $data = json_encode([
         'prompt' => $prompt,
-        'max_tokens' => 100
+        'max_tokens' => $max_tokens,
+        'temperature' => $temperature  // Add temperature parameter
     ]);
-
+    
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
