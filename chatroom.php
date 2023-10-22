@@ -7,7 +7,7 @@ if (!isLoggedIn()) {
 }
 
 // Get the selected personality ID from URL or session
-$personalityId = isset($_GET['personalityId']) ? $_GET['personalityId'] : $_SESSION['selected_personality_id'];
+$personalityId = isset($_GET['personalityId']) ? $_GET['personalityId'] : $_SESSION['personalityId'];
 
 // If no personality ID is found, redirect to lobby
 if (!$personalityId) {

@@ -4,6 +4,13 @@ require_once 'functions.php';
 if (!isLoggedIn()) {
     redirect('login.php');
 }
+
+// Check if a personalityId was submitted
+if (isset($_POST['personalityId'])) {
+    $_SESSION['personalityId'] = $_POST['personalityId'];
+    redirect('chatroom.php?personalityId='.$personalityId);
+}
+
 // Display the lobby page content
 ?>
 <!DOCTYPE html>
@@ -19,17 +26,20 @@ if (!isLoggedIn()) {
     <main>
         <h2>Browse Personalities</h2>
         <div class="personalities">
-            <?php
-            // Display the list of personalities
-            $personalities = getPersonalities();
-            foreach ($personalities as $personality) {
-                echo '<div class="personality">';
-                echo '<img src="' . $personality['profile_picture'] . '" alt="Profile Picture">';
-                echo '<h3>' . $personality['first_name'] . ' ' . $personality['last_name'] . '</h3>';
-                echo '<p>' . $personality['description'] . '</p>';
-                echo '<button onclick="selectPersonality(' . $personality['id'] . ')">Chat</button>';
-                echo '</div>';
-            }
+    <?php
+    // Display the list of personalities
+    $personalities = getPersonalities();
+    foreach ($personalities as $personality) {
+        echo '<div class="personality">';
+        echo '<img src="' . $personality['profile_picture'] . '" alt="Profile Picture">';
+        echo '<h3>' . $personality['first_name'] . ' ' . $personality['last_name'] . '</h3>';
+        echo '<p>' . $personality['description'] . '</p>';
+        echo '<form method="post" action="lobby.php">';
+        echo '<input type="hidden" name="personalityId" value="' . $personality['id'] . '">';
+        echo '<button type="submit">Chat</button>';
+        echo '</form>';
+        echo '</div>';
+    }
             ?>
         </div>
     </main>

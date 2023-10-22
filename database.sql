@@ -52,3 +52,22 @@ CREATE TABLE IF NOT EXISTS chat_history (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (personality_id) REFERENCES personalities(id)
 );
+
+-- Test data for users table
+INSERT INTO users (email, username, password, addr1, addr2, zip, state, country, first_name, last_name, subscription, role, banned, signup_date, last_login, total_messages_sent, total_cost_of_queries) VALUES
+('john.doe@example.com', 'JohnDoe', 'password123', '123 Main St', 'Apt 4', '12345', 'NY', 'USA', 'John', 'Doe', 1, 0, FALSE, NOW(), NOW(), 10, 5.00),
+('jane.doe@example.com', 'JaneDoe', 'password123', '456 Elm St', 'Suite 789', '67890', 'CA', 'USA', 'Jane', 'Doe', 2, 1, FALSE, NOW(), NOW(), 20, 10.00);
+
+-- Test data for personalities table
+INSERT INTO personalities (first_name, last_name, profile_picture, description, notes, likes, dislikes, sex, location, pre_prompt) VALUES
+('John', 'Smith', 'john_smith.jpg', 'Friendly and outgoing.', 'Loves to chat.', 'Coffee, Books', 'Loud noises', 'male', 'New York', 'You are talking to John, a friendly and outgoing person.'),
+('Jane', 'Doe', 'jane_doe.jpg', 'Introverted but thoughtful.', 'Enjoys solitude.', 'Reading, Music', 'Crowds', 'female', 'San Francisco', 'You are talking to Jane, an introverted but thoughtful person.');
+
+-- Test data for chat_history table
+INSERT INTO chat_history (user_id, personality_id, message, response, timestamp) VALUES
+(1, 1, 'Hello John!', 'Hi there! How are you?', NOW()),
+(2, 2, 'Hi Jane.', 'Hello! How can I assist you today?', NOW());
+
+-- Role and Subscription Classification:
+-- Roles: 0 = New User, 1 = Moderator, 2 = Admin, 3 = Superadmin, 100 = Owner.
+-- Subscriptions: 1 = Tier One Subscription, 2 = Tier Two Subscription, 3 = Tier Three Subscription (VIP).
