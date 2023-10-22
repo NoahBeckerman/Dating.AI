@@ -12,6 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     userLogin($usernameOrEmail, $password);
 }
 
+if (isset($_SESSION['response_type']) && $_SESSION['response_type'] === 'error') {
+    echo "<p class='error-message'>" . $_SESSION['response_data'] . "</p>";
+    unset($_SESSION['response_type']);
+    unset($_SESSION['response_data']);
+}
+
+
 // Display the login page content
 ?>
 <!DOCTYPE html>
@@ -47,6 +54,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include 'footer.php'; ?> <!-- Include the footer -->
 </body>
 </html>
-
-
-<script src="script.js"></script>

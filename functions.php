@@ -190,19 +190,23 @@ function userLogin($usernameOrEmail, $password) {
     if ($user && password_verify($password, $user['password'])) {
         session_start();
         $_SESSION['user_id'] = $user['id'];
-        echo json_encode(['status' => 'success']);
-        redirect('index.php');
-        die();
+        handleResponse('success', 'Logged in successfully');
+        header("Location: index.php");
+        exit();
     } else {
-        handleErrors('InvalidCredentials', 'Invalid username or password.');
+        handleResponse('error', 'Invalid username or password');
+        header("Location: login.php");
+        exit();
     }
 }
 
 // New function for displaying error messages
-function handleErrors($errorType, $errorMessage) {
-    echo json_encode(['errorType' => $errorType, 'errorMessage' => $errorMessage]);
-    exit();
+
+function handleResponse($responseType, $responseData) {
+    $_SESSION['response_type'] = $responseType;
+    $_SESSION['response_data'] = $responseData;
 }
+
 /**
  * Make an API call to OpenAI to generate a response.
  *
