@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     // Validate the form data
     if (empty($email) || empty($username) || empty($password)) {
-        handleInvalidCredentials('Please fill in all the requested feilds.');
+        handleErrors('InvalidData', 'Please fill in all the requested feilds.');
     } else {
         // Hash the password for security
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
