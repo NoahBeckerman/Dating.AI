@@ -238,6 +238,3 @@ function openaiApiCall($prompt) {
     $response_data = json_decode($response, true);
     return $response_data['choices'][0]['text'];
 }
-
-// Call the createDatabase function to create the database, tables, and test data
-createDatabase();
