@@ -192,23 +192,15 @@ function userLogin($usernameOrEmail, $password) {
         $_SESSION['user_id'] = $user['id'];
         redirect('index.php');
     } else {
-        handleInvalidCredentials('Invalid Username/Email, and/or password.');
+        handleErrors('InvalidCredentials', 'Invalid username or password.');
     }
 }
 
-// New function for handling invalid credentials
-function handleInvalidCredentials($message) {
-    displayErrorMessage($message);
-}
-
 // New function for displaying error messages
-function displayErrorMessage($message) {
-    echo "<script>
-            $('#responseModalBody').html('$message');
-            $('#responseModal').modal('show');
-          </script>";
+function handleErrors($errorType, $errorMessage) {
+    echo json_encode(['errorType' => $errorType, 'errorMessage' => $errorMessage]);
+    exit();
 }
-
 /**
  * Make an API call to OpenAI to generate a response.
  *
