@@ -2,6 +2,7 @@
 require_once 'config.php';
 require_once 'database.php';
 require_once 'openai.php';
+
 /**
  * Execute a database query.
  *
@@ -13,6 +14,7 @@ function executeQuery($query, $params = []) {
     global $database;
     return $database->executeQuery($query, $params);
 }
+
 /**
  * Execute a non-query database statement.
  *
@@ -24,16 +26,18 @@ function executeNonQuery($query, $params = []) {
     global $database;
     return $database->executeNonQuery($query, $params);
 }
+
 /**
- * Check if user is logged in.
+ * Check if the user is logged in.
  *
- * @return bool True if user is logged in, false otherwise.
+ * @return bool True if the user is logged in, false otherwise.
  */
 function isLoggedIn() {
     session_start();
     // Check if the 'user_id' session variable is set and not empty
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
 }
+
 /**
  * Redirect to a specific page.
  *
@@ -43,6 +47,7 @@ function redirect($page) {
     header("Location: $page");
     exit();
 }
+
 /**
  * Handle user logout.
  */
@@ -52,9 +57,10 @@ function logout() {
     $_SESSION = array();
     // Destroy the session
     session_destroy();
-    // Redirect to login page
+    // Redirect to the login page
     redirect('login.php');
 }
+
 /**
  * Create the database, tables, and test data if they do not exist.
  */
@@ -111,6 +117,7 @@ function createDatabase() {
         executeNonQuery($query, [], false);
     }
 }
+
 /**
  * Get the chat history for a user.
  *
@@ -125,6 +132,7 @@ function getChatHistory($userId) {
               ORDER BY chat_history.timestamp DESC";
     return executeQuery($query, [$userId]);
 }
+
 /**
  * Get the previous chats for a user.
  *
@@ -138,6 +146,7 @@ function getPreviousChats($userId) {
               WHERE chat_history.user_id = ?";
     return executeQuery($query, [$userId]);
 }
+
 /**
  * Get the chat messages for a user and personality.
  *
@@ -151,6 +160,7 @@ function getChatMessages($userId, $personalityId) {
               ORDER BY timestamp ASC";
     return executeQuery($query, [$userId, $personalityId]);
 }
+
 /**
  * Get the list of personalities.
  *
@@ -160,6 +170,7 @@ function getPersonalities() {
     $query = "SELECT * FROM personalities";
     return executeQuery($query);
 }
+
 /**
  * Get a user by username or email.
  *
@@ -171,6 +182,7 @@ function getUserByUsernameOrEmail($usernameOrEmail) {
     $result = executeQuery($query, [$usernameOrEmail, $usernameOrEmail]);
     return $result[0] ?? null;
 }
+
 /**
  * Store a chat record in the database.
  *
@@ -184,8 +196,6 @@ function storeChatRecord($userId, $personalityId, $message, $response) {
               VALUES (?, ?, ?, ?)";
     executeNonQuery($query, [$userId, $personalityId, $message, $response]);
 }
-
-
 
 /**
  * Send a message to the AI and get the response.
@@ -201,6 +211,7 @@ function sendMessage($message, $personalityId) {
     storeChatRecord($userId, $personalityId, $message, $response);
     return $response;
 }
+
 /**
  * Get a personality by ID.
  *
@@ -212,6 +223,13 @@ function getPersonalityById($personalityId) {
     $result = executeQuery($query, [$personalityId]);
     return $result[0] ?? null;
 }
+
+/**
+ * Make an API call to OpenAI to generate a response.
+ *
+ * @param string $prompt The user message prompt.
+ * @return string The AI response.
+ */
 function openaiApiCall($prompt) {
     $api_key = OPENAI_API_KEY;
     $engine = ENGINE_NAME;
@@ -224,7 +242,7 @@ function openaiApiCall($prompt) {
         'max_tokens' => $max_tokens,
         'temperature' => $temperature  // Add temperature parameter
     ]);
-    
+
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
