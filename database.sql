@@ -28,7 +28,3 @@ CREATE TABLE IF NOT EXISTS chat_history (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (personality_id) REFERENCES personalities(id)
 );
-INSERT INTO users (email, username, password) VALUES
-    ('test1@example.com', 'test1', 'password1'),
-    ('test2@example.com', 'test2', 'password2'),
-    ('test3@example.com', 'test3', 'password3');

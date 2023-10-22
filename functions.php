@@ -224,6 +224,28 @@ function getPersonalityById($personalityId) {
     return $result[0] ?? null;
 }
 
+
+function userLogin($usernameOrEmail, $password) {
+    $user = getUserByUsernameOrEmail($usernameOrEmail);
+    if ($user && password_verify($password, $user['password'])) {
+        session_start();
+        $_SESSION['user_id'] = $user['id'];
+        redirect('index.php');
+    } else {
+        handleInvalidCredentials();
+    }
+}
+
+// New function for handling invalid credentials
+function handleInvalidCredentials() {
+    displayErrorMessage("Invalid username or password.");
+}
+
+// New function for displaying error messages
+function displayErrorMessage($message) {
+    echo "<div class='error-message-invalid-login'>$message</div>";
+}
+
 /**
  * Make an API call to OpenAI to generate a response.
  *

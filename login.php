@@ -7,21 +7,11 @@ if (isLoggedIn()) {
 }
 // Handle form submission for user login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve the form data
     $usernameOrEmail = $_POST['username_or_email'];
     $password = $_POST['password'];
-    // Authenticate the user
-    $user = getUserByUsernameOrEmail($usernameOrEmail);
-    if ($user && password_verify($password, $user['password'])) {
-        // Start the session and store the user ID
-        session_start();
-        $_SESSION['user_id'] = $user['id'];
-        // Redirect to index page after successful login
-        redirect('index.php');
-    } else {
-        // TODO: Handle invalid login credentials
-    }
+    userLogin($usernameOrEmail, $password);
 }
+
 // Display the login page content
 ?>
 <!DOCTYPE html>

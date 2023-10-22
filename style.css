@@ -116,6 +116,11 @@ body {
     background-color: #ff0000;
     color: #ffffff;
   }
+
+  .error-message-invalid-login {
+    color: red;
+    font-weight: bold;
+}
   
   .warning-message {
     background-color: #ffcc00;
