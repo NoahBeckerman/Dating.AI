@@ -1,6 +1,8 @@
 <?php
 require_once 'config.php';
 require_once 'database.php';
+require_once 'modal.php';
+require_once 'display_message.php'; 
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -190,22 +192,23 @@ function userLogin($usernameOrEmail, $password) {
     if ($user && password_verify($password, $user['password'])) {
         session_start();
         $_SESSION['user_id'] = $user['id'];
-        handleResponse('success', 'Logged in successfully');
+        handleResponse('SUCCESS', 'Valid Credentials Provided.',  'Redirecting you now...');
         header("Location: index.php");
         exit();
     } else {
-        handleResponse('error', 'Invalid username or password');
-        header("Location: login.php");
+        handleResponse('ERROR', 'InvalidCredentials', 'Invalid username or password.');
+       
         exit();
     }
 }
 
-// New function for displaying error messages
-
-function handleResponse($responseType, $responseData) {
+// Generic function for handling messages
+function handleResponse($responseType, $responseTitle, $responseData) {
     $_SESSION['response_type'] = $responseType;
+    $_SESSION['response_title'] = $responseTitle;
     $_SESSION['response_data'] = $responseData;
 }
+
 
 /**
  * Make an API call to OpenAI to generate a response.
