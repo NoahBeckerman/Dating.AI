@@ -2,6 +2,10 @@
 require_once 'config.php';
 require_once 'database.php';
 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 /**
  * Execute a database query.
  *
@@ -32,7 +36,6 @@ function executeNonQuery($query, $params = []) {
  * @return bool True if the user is logged in, false otherwise.
  */
 function isLoggedIn() {
-    session_start();
     // Check if the 'user_id' session variable is set and not empty
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
 }
