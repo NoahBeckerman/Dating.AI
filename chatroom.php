@@ -70,11 +70,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 foreach ($chatMessages as $message) {
                     echo '
 							<div class="chat-message">' .
-                        $message["message"] .
+                        'You: ' . $message["message"] .
                         "</div>";
                     echo '
 							<div class="chat-response">' .
-                        $message["response"] .
+                        $message["response"] . '<br>' . 
                         "</div>";
                 }
                 ?> </div>

@@ -60,7 +60,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </div>
           <div id="collapseOne" class="collapse show" data-parent="#accordion">
             <div class="card-body">
-              <form action="functions.php" method="post" enctype="multipart/form-data" class="form-signin"> Username <input type="text" name="username" class="form-control" placeholder="Username" required> Email <input type="email" name="email" class="form-control" placeholder="Email" required> Password <input type="password" name="password" class="form-control" placeholder="Password" required> Profile Picture <div class="custom-file">
+              <form action="profile.php" method="post" enctype="multipart/form-data" class="form-signin">
+                 Username <input type="text" name="username" class="form-control" placeholder="Username" required> 
+                 Email <input type="email" name="email" class="form-control" placeholder="Email" required> 
+                 Password <input type="password" name="password" class="form-control" placeholder="Password" required>
+                 Age <input type="text" name="age" class="form-control" placeholder="" > 
+                 Preferences <input type="text" name="Preferences" class="form-control" placeholder="" > 
+                  Profile Picture <div class="custom-file">
                   <input type="file" class="custom-file-input" id="profile_picture" name="profile_picture">
                   <label class="custom-file-label" for="profile_picture">Choose Profile Picture</label>
                 </div>
@@ -76,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </div>
           <div id="collapseTwo" class="collapse" data-parent="#accordion">
             <div class="card-body">
-              <form action="functions.php" method="post" class="form-signin"> Address Line 1 <input type="text" name="addr1" class="form-control" placeholder="Address Line 1"> Address Line 2 <input type="text" name="addr2" class="form-control" placeholder="Address Line 2"> ZIP Code <input type="text" name="zip" class="form-control" placeholder="ZIP Code"> State <input type="text" name="state" class="form-control" placeholder="State"> Country <input type="text" name="country" class="form-control" placeholder="Country"> First Name <input type="text" name="first_name" class="form-control" placeholder="First Name"> Last Name <input type="text" name="last_name" class="form-control" placeholder="Last Name">
+              <form action="profile.php" method="post" class="form-signin"> Address Line 1 <input type="text" name="addr1" class="form-control" placeholder="Address Line 1"> Address Line 2 <input type="text" name="addr2" class="form-control" placeholder="Address Line 2"> ZIP Code <input type="text" name="zip" class="form-control" placeholder="ZIP Code"> State <input type="text" name="state" class="form-control" placeholder="State"> Country <input type="text" name="country" class="form-control" placeholder="Country"> First Name <input type="text" name="first_name" class="form-control" placeholder="First Name"> Last Name <input type="text" name="last_name" class="form-control" placeholder="Last Name">
                 <button type="submit" name="update_billing" class="btn btn-primary">Update Billing</button>
               </form>
             </div>

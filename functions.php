@@ -115,6 +115,23 @@ function getChatHistory($userId)
     return executeQuery($query, [$userId]);
 }
 
+
+function getChatHistoryMEMORY($userId, $personalityId) {
+    // SQL query to fetch chat history
+    $sql = "SELECT * FROM chat_history WHERE user_id = ? AND personality_id = ? ORDER BY timestamp DESC LIMIT 5";
+    
+    // Execute the query
+    $result = executeQuery($sql, [$userId, $personalityId]);
+
+    if ($result !== false) {
+        return array_reverse($result); // Reverse to get the latest 5 messages at the end
+    } else {
+        // Handle the error appropriately
+        return false;
+    }
+}
+
+
 /**
  * Get the previous chats for a user.
  *
@@ -185,20 +202,121 @@ function storeChatRecord($userId, $personalityId, $message, $response)
 }
 
 /**
- * Send a message to the AI and get the response.
- *
- * @param string $message The user message.
- * @param int $personalityId The personality ID.
- * @return string The AI response.
+ * Send a message to the AI and receive a response.
+ * 
+ * @param int $userId The ID of the user sending the message.
+ * @param string $message The message text from the user.
+ * @param int $personalityId The ID of the AI personality to interact with.
+ * 
+ * @return string The AI's response.
+ * 
+ * This function performs several key tasks:
+ * 1. Retrieves the context for the user and the AI personality.
+ * 2. Limits the conversation history to manage token usage.
+ * 3. Constructs a comprehensive prompt for the AI, including user context, personality context, and conversation history.
+ * 4. Makes an API call to OpenAI to generate the AI's response.
+ * 
+ * The AI's response is based on the constructed prompt, which includes:
+ * - User context like username and preferences.
+ * - Personality context including role-playing guidelines and character attributes.
+ * - Limited conversation history for context.
+ * 
+ * The function assumes that the following helper functions exist and return the expected types of data:
+ * - getPersonalityById()
+ * - getUserById()
+ * - getChatHistory()
+ * 
+ * The OpenAI API call is made through the openaiApiCall() function.
  */
 function sendMessage($userId, $message, $personalityId)
 {
+    // Fetch Personality Context
     $personality = getPersonalityById($personalityId);
-    $prePrompt = getPromptByPersonalityId($personalityId); // Assuming this function returns the pre_prompt
-    $prompt = $prePrompt . "\nUser: " . $message;
-    $response = openaiApiCall($prompt);
+    $prePrompt = getPromptByPersonalityId($personalityId);
+
+    // Fetch User Context
+    $user = getUserById($userId);
+
+    // Fetch Limited Conversation History
+    $chatHistory = array_slice(getChatHistory($userId), 0, 5);
+
+    // Construct the User and Personality Context
+    $context = "======";
+    $context .= "\n";
+    $context .= "[Users Context]\n";
+    $context .= "First Name: {$user['first_name']}, Last Name: {$user['last_name']}, Age: {$user['age']}, Preferences: {$user['preferences']}\n";
+    $context .= "\n";
+    $context .= "\n=====";
+    $context .= "\n";
+    $context .= "[Your Personality Context]\n";
+    $context .= "\n";
+    $context .= "Description: {$personality['description']}\n";
+    $context .= "\n";
+    $context .= "Notes: {$personality['notes']}\n";
+    $context .= "\n";
+    $context .= "Likes: {$personality['likes']}\n";
+    $context .= "\n";
+    $context .= "Dislikes: {$personality['dislikes']}\n";
+    $context .= "\n";
+    $context .= "Sex: {$personality['sex']}\n";
+    $context .= "\n";
+    $context .= "Location: {$personality['location']}\n";
+    $context .= "\n";
+    $context .= "\n===";
+    $context .= "\n";
+    $context .= "Reminder and context: You are pretending and roleplaying to be {$personality['first_name']} {$personality['last_name']}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT.\n";
+    $context .= "\n";  
+    $context .= "[Prior Conversation History With The User]\n";
+// Fetch Limited Conversation History
+$chatHistory = getChatHistoryMEMORY($userId, $personalityId);
+
+// If you still want to limit it to the last 5 messages, you can use array_slice
+$chatHistory = array_slice($chatHistory, 0, 5);
+
+// Append the chat history to the context
+foreach ($chatHistory as $chat) {
+    $context .= "User: {$chat['message']}\n";
+    $context .= "{$chat['response']}\n";
+}
+
+    
+    $engine = explode("\n", $prePrompt)[0]; // Assuming the engine name is the first line in pre_prompt
+
+    // Check if the engine is a chat model
+    if (strpos($engine, 'gpt-4') !== false || strpos($engine, 'gpt-3.5') !== false) {
+        $messages = [
+            ["role" => "system", "content" => $context],
+            ["role" => "user", "content" => ('Users Message: ' . $message)]
+        ];
+        $prompt = null;
+    } else {
+        $prompt = $context . "\n[User's Current Message]\n";
+        $prompt .= "User: {$message}";
+        $messages = null;
+    }
+
+    // Make the API call
+    $response = openaiApiCall($prompt, $engine, $messages, $personality);
+
     return $response;
 }
+
+function getTokenLimitByPersonalityId($personalityId)
+{
+    // Mapping of personality IDs to token limits
+    $tokenLimits = [
+        'gpt-4-32k' => 32768,
+        'gpt-4' => 8192,
+        'gpt-3.5-turbo-16k' => 16384,
+        'gpt-3.5-turbo' => 4096,
+        'text-ada-001' => 2049,
+        'text-davinci-003' => 4096
+        // Add other models here
+    ];
+
+    return $tokenLimits[$personalityId] ?? null;
+}
+
 
 /**
  * Get the pre_prompt for a specific personality ID.
@@ -375,47 +493,101 @@ function SystemFlag($MessageTitle, $SystemMessage, $Message_Type, $UserFacing)
     ];
 }
 
+
+function estimate_tokens($text, $method = "max") {
+    // Initialize word and character counts
+    $word_count = str_word_count($text);
+    $char_count = strlen($text);
+
+    // Calculate estimated token counts
+    $tokens_count_word_est = $word_count / 0.75;
+    $tokens_count_char_est = $char_count / 4.0;
+
+    // Initialize output
+    $output = 0;
+
+    // Determine method for token estimation
+    switch ($method) {
+        case "average":
+            $output = ($tokens_count_word_est + $tokens_count_char_est) / 2;
+            break;
+        case "words":
+            $output = $tokens_count_word_est;
+            break;
+        case "chars":
+            $output = $tokens_count_char_est;
+            break;
+        case "max":
+            $output = max($tokens_count_word_est, $tokens_count_char_est);
+            break;
+        case "min":
+            $output = min($tokens_count_word_est, $tokens_count_char_est);
+            break;
+        default:
+            return "Invalid method. Use 'average', 'words', 'chars', 'max', or 'min'.";
+    }
+
+    return (int)$output;
+}
+
+
 /**
  * Make an API call to OpenAI to generate a response.
  *
  * @param string $prompt The user message prompt.
+ * @param string $engine The engine to use for the API call.
  * @return string The AI response.
  */
-function openaiApiCall($prompt)
+function openaiApiCall($prompt, $engine, $messages = null, $personality)
 {
     $api_key = OPENAI_API_KEY;
-    $engine = ENGINE_NAME;
-    $max_tokens = MAX_TOKENS; // Retrieve max tokens from config.php
-    $temperature = TEMPERATURE; // Retrieve temperature from config.php
-    $url = "https://api.openai.com/v1/engines/$engine/completions";
+    $max_tokens = getTokenLimitByPersonalityId($engine);
+    $temperature = TEMPERATURE;
 
-    $data = json_encode([
-        "prompt" => $prompt,
-        "max_tokens" => $max_tokens,
-        "temperature" => $temperature, // Add temperature parameter
-    ]);
+    $token_estimate = ($messages !== null) ? estimate_tokens(json_encode($messages)) : estimate_tokens($prompt);
+    $adjusted_max_tokens = min($max_tokens, 1800 - $token_estimate); // 2049 is the maximum token limit for the model
 
+
+    // Prepare API call data based on the engine type
+    $data = strpos($engine, 'gpt-4') !== false || strpos($engine, 'gpt-3.5') !== false ?
+     json_encode([
+            "model" => $engine,
+            "messages" => $messages,
+            "max_tokens" => $adjusted_max_tokens,
+            "temperature" => $temperature
+        ]) :
+        json_encode([
+            "prompt" => $prompt,
+            "max_tokens" => $adjusted_max_tokens,
+            "temperature" => $temperature
+        ]);
+
+    $url = strpos($engine, 'gpt-4') !== false || strpos($engine, 'gpt-3.5') !== false ?
+        "https://api.openai.com/v1/chat/completions" :
+        "https://api.openai.com/v1/engines/$engine/completions";
+
+    // Initialize cURL
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Content-Type: application/json",
-        "Authorization: Bearer $api_key",
+        "Authorization: Bearer $api_key"
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
+    // Execute cURL and close
     $response = curl_exec($ch);
     curl_close($ch);
 
+    // Decode JSON response
     $response_data = json_decode($response, true);
+
+    // Extract AI response and other details
     if (isset($response_data["choices"][0]["text"])) {
         $aiResponse = $response_data["choices"][0]["text"];
-        $aiResponse = trim($aiResponse); // Remove any extra characters or formatting
-
-        $promptTokens = $response_data["usage"]["prompt_tokens"];
-        $completionTokens = $response_data["usage"]["completion_tokens"];
-        $totalTokens = $response_data["usage"]["total_tokens"];
-        $model = $response_data["model"];
+    } elseif (isset($response_data["choices"][0]["message"]["content"])) {
+        $aiResponse = $response_data["choices"][0]["message"]["content"];
     } else {
         SystemFlag(
             "API ERROR",
@@ -426,5 +598,15 @@ function openaiApiCall($prompt)
         $aiResponse = $response;
         var_dump($aiResponse);
     }
-    return $aiResponse;
+   
+    $aiResponse = str_replace("[Your Reply]", "", $aiResponse);
+    $aiResponse = str_replace("[Your Response]", "", $aiResponse);
+    $aiResponse = trim($aiResponse);
+
+    //$promptTokens = $response_data["usage"]["prompt_tokens"];
+    //$completionTokens = $response_data["usage"]["completion_tokens"];
+    //$totalTokens = $response_data["usage"]["total_tokens"];
+    //$model = $response_data["model"];
+    var_dump('<br> MAX TOKENS: ' . $max_tokens . ' TOKENS EST: ' . $token_estimate . ' Actuall Tokens: ' . $response_data["usage"]["prompt_tokens"]);
+    return $aiResponse . '<br>';
 }

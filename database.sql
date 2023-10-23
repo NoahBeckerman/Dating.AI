@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
+    age int,
+    preferences VARCHAR(255), 
     password VARCHAR(255) NOT NULL,
     addr1 VARCHAR(255),
     addr2 VARCHAR(255),
