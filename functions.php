@@ -168,10 +168,22 @@ function storeChatRecord($userId, $personalityId, $message, $response) {
  */
 function sendMessage($userId, $message, $personalityId) {
     $personality = getPersonalityById($personalityId);
-    $prompt = $personality['description'] . "\nUser: " . $message;
+    $prePrompt = getPromptByPersonalityId($personalityId);  // Assuming this function returns the pre_prompt
+    $prompt = $prePrompt . "\nUser: " . $message;
     $response = openaiApiCall($prompt);
-    storeChatRecord($userId, $personalityId, $message, $response);
     return $response;
+}
+
+/**
+ * Get the pre_prompt for a specific personality ID.
+ *
+ * @param int $personalityId The personality ID.
+ * @return string The pre_prompt for the personality.
+ */
+function getPromptByPersonalityId($personalityId) {
+    $query = "SELECT pre_prompt FROM personalities WHERE id = ?";
+    $result = executeQuery($query, [$personalityId]);
+    return $result[0]['pre_prompt'] ?? null;
 }
 
 /**
@@ -247,15 +259,22 @@ function openaiApiCall($prompt) {
     $response = curl_exec($ch);
     curl_close($ch);
 
+ 
     $response_data = json_decode($response, true);
-    if (isset($response['choices'][0]['text'])) {
-        $aiResponse = $response['choices'][0]['text'];
-    } else {
-        SystemFlag('API ERROR', 'API OUTPUT DOES NOT MEET REQUIREMENTS.' , 'ERROR', 1);
-        $aiResponse = $response ;
+if (isset($response_data['choices'][0]['text'])) {
+    $aiResponse = $response_data['choices'][0]['text'];
+    $aiResponse = trim($aiResponse);  // Remove any extra characters or formatting
+    
+    $promptTokens = $response_data['usage']['prompt_tokens'];
+    $completionTokens = $response_data['usage']['completion_tokens'];
+    $totalTokens = $response_data['usage']['total_tokens'];
+    $model = $response_data['model'];
+    
+} else {
+    SystemFlag('API ERROR', 'API OUTPUT DOES NOT MEET REQUIREMENTS.' , 'ERROR', 1);
+    $aiResponse = $response;
     var_dump($aiResponse);
-    }
-    return $aiResponse;
+}
+return $aiResponse;
 }
 
-//{ "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations", "id": "cmpl-8Ci9IAnaWDuEPqJAU8Gp8y3AhVSpL", "object": "text_completion", "created": 1698040336, "model": "text-ada-001", "choices": [ { "text": "\n\n\nHi! I'm here by the way?", "index": 0, "logprobs": null, "finish_reason": "stop" } ], "usage": { "prompt_tokens": 15, "completion_tokens": 12, "total_tokens": 27 } }
