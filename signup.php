@@ -1,28 +1,35 @@
 <?php
-require_once 'functions.php';
+require_once "functions.php";
 // Check if user is already logged in, if yes, redirect to index page
 if (isLoggedIn()) {
-    redirect('index.php');
+    redirect("index.php");
 }
 // Handle form submission for user registration
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Retrieve the form data
-    $email = $_POST['email'];
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $email = $_POST["email"];
+    $username = $_POST["username"];
+    $password = $_POST["password"];
     // Validate the form data
     if (empty($email) || empty($username) || empty($password)) {
-        SystemFlag('MissingCredentials', 'Please fill in all the requested feilds.', 'ERROR', 1);
+        SystemFlag(
+            "MissingCredentials",
+            "Please fill in all the requested feilds.",
+            "ERROR",
+            1
+        );
     } else {
         // Hash the password for security
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         // Insert the new user into the database
-        $query = "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
+        $query =
+            "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
         executeNonQuery($query, [$email, $username, $hashedPassword]);
         // Redirect to the login page after successful registration
-        redirect('login.php');
+        redirect("login.php");
     }
 }
+
 // Display the signup page content
 ?>
 <!DOCTYPE html>
@@ -39,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </head>
 <body>
-    <?php include 'header.php'; ?> <!-- Include the header -->
+    <?php include "header.php"; ?> <!-- Include the header -->
     <main>
         <h2>Create an Account</h2>
         <form action="signup.php" method="POST">
@@ -58,6 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" value="Sign Up">
         </form>
     </main>
-    <?php include 'footer.php'; ?> <!-- Include the footer -->
+    <?php include "footer.php"; ?> <!-- Include the footer -->
 </body>
 </html>

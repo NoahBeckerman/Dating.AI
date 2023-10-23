@@ -8,7 +8,7 @@
       <li class="nav-item active">
         <a class="nav-link" href="index.php">Home</a>
       </li>
-      <?php if (isset($_SESSION['user_id'])): ?>
+      <?php if (isset($_SESSION["user_id"])): ?>
         <li class="nav-item">
           <a class="nav-link" href="lobby.php">Browse Personalities</a>
         </li>

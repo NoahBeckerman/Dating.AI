@@ -1,15 +1,15 @@
 <?php
-require_once 'functions.php';
+require_once "functions.php";
 // Check if user is logged in, otherwise redirect to login page
 if (!isLoggedIn()) {
-    redirect('login.php');
+    redirect("login.php");
 }
 
 // Check if a personalityId was submitted
 // Check if a personalityId was submitted
-if (isset($_POST['personalityId'])) {
-    $_SESSION['personalityId'] = $_POST['personalityId'];
-    redirect('chatroom.php?personalityId='.$_SESSION['personalityId']);
+if (isset($_POST["personalityId"])) {
+    $_SESSION["personalityId"] = $_POST["personalityId"];
+    redirect("chatroom.php?personalityId=" . $_SESSION["personalityId"]);
 }
 
 // Display the lobby page content
@@ -28,7 +28,7 @@ if (isset($_POST['personalityId'])) {
 
 </head>
 <body>
-    <?php include 'header.php'; ?> <!-- Include the header -->
+    <?php include "header.php"; ?> <!-- Include the header -->
     <main>
         <h2>Browse Personalities</h2>
         <div class="personalities">
@@ -37,18 +37,26 @@ if (isset($_POST['personalityId'])) {
     $personalities = getPersonalities();
     foreach ($personalities as $personality) {
         echo '<div class="personality">';
-        echo '<img src="' . $personality['profile_picture'] . '" alt="Profile Picture">';
-        echo '<h3>' . $personality['first_name'] . ' ' . $personality['last_name'] . '</h3>';
-        echo '<p>' . $personality['description'] . '</p>';
+        echo '<img src="' .
+            $personality["profile_picture"] .
+            '" alt="Profile Picture">';
+        echo "<h3>" .
+            $personality["first_name"] .
+            " " .
+            $personality["last_name"] .
+            "</h3>";
+        echo "<p>" . $personality["description"] . "</p>";
         echo '<form method="post" action="lobby.php">';
-        echo '<input type="hidden" name="personalityId" value="' . $personality['id'] . '">';
+        echo '<input type="hidden" name="personalityId" value="' .
+            $personality["id"] .
+            '">';
         echo '<button type="submit">Chat</button>';
-        echo '</form>';
-        echo '</div>';
+        echo "</form>";
+        echo "</div>";
     }
-            ?>
+    ?>
         </div>
     </main>
-    <?php include 'footer.php'; ?> <!-- Include the footer -->
+    <?php include "footer.php"; ?> <!-- Include the footer -->
 </body>
 </html>

@@ -1,21 +1,35 @@
 <?php
-require_once 'config.php';
-require_once 'database.php';
+/**
+ * Functions for Dating.AI application.
+ *
+ * This file contains utility functions that are used across the Dating.AI application.
+ * These functions provide functionalities like database operations, user authentication,
+ * and interaction with the OpenAI API.
+ *
+ * @package Dating.AI
+ */
 
+require_once "config.php";
+require_once "database.php";
 
-
+// Initialize session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
 /**
- * Execute a database query.
+ * Execute a database query and return the result.
  *
- * @param string $query The SQL query.
- * @param array $params The query parameters.
- * @return array|bool The result of the query as an associative array, or false on failure.
+ * This function is a wrapper around the Database class's executeQuery method.
+ * It executes a given SQL query with optional parameters and returns the result.
+ *
+ * @param string $query  The SQL query to execute.
+ * @param array  $params Optional parameters for the query.
+ *
+ * @return array|bool The result set as an associative array, or false on failure.
  */
-function executeQuery($query, $params = []) {
+function executeQuery($query, $params = [])
+{
     global $database;
     return $database->executeQuery($query, $params);
 }
@@ -27,7 +41,8 @@ function executeQuery($query, $params = []) {
  * @param array $params The query parameters.
  * @return bool True if the statement executed successfully, false otherwise.
  */
-function executeNonQuery($query, $params = []) {
+function executeNonQuery($query, $params = [])
+{
     global $database;
     return $database->executeNonQuery($query, $params);
 }
@@ -37,9 +52,10 @@ function executeNonQuery($query, $params = []) {
  *
  * @return bool True if the user is logged in, false otherwise.
  */
-function isLoggedIn() {
+function isLoggedIn()
+{
     // Check if the 'user_id' session variable is set and not empty
-    return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+    return isset($_SESSION["user_id"]) && !empty($_SESSION["user_id"]);
 }
 
 /**
@@ -47,7 +63,8 @@ function isLoggedIn() {
  *
  * @param string $page The page to redirect to.
  */
-function redirect($page) {
+function redirect($page)
+{
     header("Location: $page");
     exit();
 }
@@ -55,27 +72,29 @@ function redirect($page) {
 /**
  * Handle user logout.
  */
-function logout() {
+function logout()
+{
     session_start();
     // Unset all session variables
-    $_SESSION = array();
+    $_SESSION = [];
     // Destroy the session
     session_destroy();
     // Redirect to the login page
-    redirect('login.php');
+    redirect("login.php");
 }
 
 /**
  * Create the database, tables, and test data if they do not exist.
  */
-function importDatabase() {
+function importDatabase()
+{
     global $database;
     // Check if the database exists
     $query = "SHOW DATABASES LIKE '" . DB_NAME . "'";
     $result = executeQuery($query);
     if (count($result) == 0) {
         // Import the database from database.sql
-        $sql = file_get_contents('database.sql');
+        $sql = file_get_contents("database.sql");
         $database->getConnection()->multi_query($sql);
     }
 }
@@ -86,7 +105,8 @@ function importDatabase() {
  * @param int $userId The user ID.
  * @return array The chat history.
  */
-function getChatHistory($userId) {
+function getChatHistory($userId)
+{
     $query = "SELECT chat_history.*, personalities.first_name, personalities.last_name
               FROM chat_history
               INNER JOIN personalities ON chat_history.personality_id = personalities.id
@@ -101,7 +121,8 @@ function getChatHistory($userId) {
  * @param int $userId The user ID.
  * @return array The previous chats.
  */
-function getPreviousChats($userId) {
+function getPreviousChats($userId)
+{
     $query = "SELECT DISTINCT chat_history.personality_id, personalities.first_name, personalities.last_name
               FROM chat_history
               INNER JOIN personalities ON chat_history.personality_id = personalities.id
@@ -116,7 +137,8 @@ function getPreviousChats($userId) {
  * @param int $personalityId The personality ID.
  * @return array The chat messages.
  */
-function getChatMessages($userId, $personalityId) {
+function getChatMessages($userId, $personalityId)
+{
     $query = "SELECT message, response FROM chat_history
               WHERE user_id = ? AND personality_id = ?
               ORDER BY timestamp ASC";
@@ -128,7 +150,8 @@ function getChatMessages($userId, $personalityId) {
  *
  * @return array The list of personalities.
  */
-function getPersonalities() {
+function getPersonalities()
+{
     $query = "SELECT * FROM personalities";
     return executeQuery($query);
 }
@@ -139,7 +162,8 @@ function getPersonalities() {
  * @param string $usernameOrEmail The username or email.
  * @return array|null The user data or null if not found.
  */
-function getUserByUsernameOrEmail($usernameOrEmail) {
+function getUserByUsernameOrEmail($usernameOrEmail)
+{
     $query = "SELECT * FROM users WHERE username = ? OR email = ?";
     $result = executeQuery($query, [$usernameOrEmail, $usernameOrEmail]);
     return $result[0] ?? null;
@@ -153,7 +177,8 @@ function getUserByUsernameOrEmail($usernameOrEmail) {
  * @param string $message The user message.
  * @param string $response The AI response.
  */
-function storeChatRecord($userId, $personalityId, $message, $response) {
+function storeChatRecord($userId, $personalityId, $message, $response)
+{
     $query = "INSERT INTO chat_history (user_id, personality_id, message, response)
               VALUES (?, ?, ?, ?)";
     executeNonQuery($query, [$userId, $personalityId, $message, $response]);
@@ -166,9 +191,10 @@ function storeChatRecord($userId, $personalityId, $message, $response) {
  * @param int $personalityId The personality ID.
  * @return string The AI response.
  */
-function sendMessage($userId, $message, $personalityId) {
+function sendMessage($userId, $message, $personalityId)
+{
     $personality = getPersonalityById($personalityId);
-    $prePrompt = getPromptByPersonalityId($personalityId);  // Assuming this function returns the pre_prompt
+    $prePrompt = getPromptByPersonalityId($personalityId); // Assuming this function returns the pre_prompt
     $prompt = $prePrompt . "\nUser: " . $message;
     $response = openaiApiCall($prompt);
     return $response;
@@ -180,10 +206,11 @@ function sendMessage($userId, $message, $personalityId) {
  * @param int $personalityId The personality ID.
  * @return string The pre_prompt for the personality.
  */
-function getPromptByPersonalityId($personalityId) {
+function getPromptByPersonalityId($personalityId)
+{
     $query = "SELECT pre_prompt FROM personalities WHERE id = ?";
     $result = executeQuery($query, [$personalityId]);
-    return $result[0]['pre_prompt'] ?? null;
+    return $result[0]["pre_prompt"] ?? null;
 }
 
 /**
@@ -192,12 +219,12 @@ function getPromptByPersonalityId($personalityId) {
  * @param int $personalityId The personality ID.
  * @return array|null The personality data or null if not found.
  */
-function getPersonalityById($personalityId) {
+function getPersonalityById($personalityId)
+{
     $query = "SELECT * FROM personalities WHERE id = ?";
     $result = executeQuery($query, [$personalityId]);
     return $result[0] ?? null;
 }
-
 
 /**
  * Get a user by ID.
@@ -205,89 +232,148 @@ function getPersonalityById($personalityId) {
  * @param int $userId The user ID.
  * @return array|null The user data or null if not found.
  */
-function getUserById($userId) {
+function getUserById($userId)
+{
     $query = "SELECT * FROM users WHERE id = ?";
     $result = executeQuery($query, [$userId]);
     return $result[0] ?? null;
 }
 /**
- * Migrate and delete user's chat history.
+ * Migrate and Delete User's Chat History.
  *
- * @param int $userId The ID of the user whose chat history needs to be migrated and deleted.
+ * This function is responsible for migrating the chat history of a specific user
+ * to a separate table for deleted conversations. After successful migration,
+ * the chat history is deleted from the original table.
+ *
+ * @param int $userId The unique identifier of the user.
+ *
  * @return bool True if the operation is successful, false otherwise.
  */
-function migrateAndDeleteChatHistory($userId) {
-    // SQL query to select chat history for the specific user
-    $selectQuery = "SELECT * FROM chat_history WHERE userId = :userId";
-    
-    // Execute the query
-    $chatHistory = executeQuery($selectQuery, ['userId' => $userId]);
-    
+function migrateAndDeleteChatHistory($userId)
+{
+    // SQL query to fetch chat history for the specified user
+    $selectQuery = "SELECT * FROM chat_history WHERE user_id = ?";
+
+    // Execute the query to fetch chat history
+    $chatHistory = executeQuery($selectQuery, [$userId]);
+
+    // Validate the result of the query execution
     if ($chatHistory === false) {
-        // Log the error or handle it as needed
-        SystemFlag('ClearHistoryFailure', 'Unable to fetch chat history.' , 'ERROR', 1);
+        SystemFlag(
+            "ClearHistoryFailure",
+            "Unable to fetch chat history.",
+            "ERROR",
+            1
+        );
         return false;
     }
-    
-    // SQL query to insert chat history into UserDeletedConversation table
-    $insertQuery = "INSERT INTO UserDeletedConversation (userId, message, timestamp) VALUES (:userId, :message, :timestamp)";
-    
-    // Migrate each chat record
+
+    // SQL query to migrate chat history to UserDeletedConversation table
+    $insertQuery =
+        "INSERT INTO UserDeletedConversation (user_id, personality_id, message, response, timestamp) VALUES (?, ?, ?, ?, ?)";
+
+    // Loop through each chat record and migrate it
     foreach ($chatHistory as $record) {
         $params = [
-            'userId' => $record['userId'],
-            'message' => $record['message'],
-            'timestamp' => $record['timestamp']
+            $record["user_id"],
+            $record["personality_id"],
+            $record["message"],
+            $record["response"],
+            $record["timestamp"],
         ];
-        
+
+        // Execute the query to insert each chat record
         $insertResult = executeNonQuery($insertQuery, $params);
-        
+
+        // Validate the result of the query execution
         if (!$insertResult) {
-            // Log the error or handle it as needed
-            SystemFlag('ClearHistoryFailure', 'Unable to migrate/copy chat history.' , 'ERROR', 1);
+            SystemFlag(
+                "ClearHistoryFailure",
+                "Unable to migrate chat history.",
+                "ERROR",
+                1
+            );
             return false;
         }
     }
-    
-    // SQL query to delete chat history from ChatHistory table
-    $deleteQuery = "DELETE FROM ChatHistory WHERE userId = :userId";
-    
-    // Execute the query
-    $deleteResult = executeNonQuery($deleteQuery, ['userId' => $userId]);
-    
+
+    // SQL query to delete chat history from the original table
+    $deleteQuery = "DELETE FROM chat_history WHERE user_id = ?";
+
+    // Execute the query to delete chat history
+    $deleteResult = executeNonQuery($deleteQuery, [$userId]);
+
     return $deleteResult;
 }
 
-
-
-function userLogin($usernameOrEmail, $password) {
+/**
+ * Authenticate a user and initiate a session.
+ *
+ * This function attempts to authenticate a user based on the provided username or email and password.
+ * If authentication is successful, a session is initiated, and the user is redirected to the index page.
+ * Otherwise, an error flag is set.
+ *
+ * @param string $usernameOrEmail The username or email address of the user.
+ * @param string $password        The password of the user.
+ *
+ * @return void
+ */
+function userLogin($usernameOrEmail, $password)
+{
+    // Fetch user data based on username or email
     $user = getUserByUsernameOrEmail($usernameOrEmail);
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
+
+    // Verify the provided password against the stored hash
+    if ($user && password_verify($password, $user["password"])) {
+        // Set the user ID in the session to log in the user
+        $_SESSION["user_id"] = $user["id"];
+
+        // Redirect to the index page
         header("Location: index.php");
         exit();
     } else {
-        SystemFlag('Invalid Credentials', 'Invalid username or password.' , 'ERROR', 1);
-
+        // Set an error flag for invalid credentials
+        SystemFlag(
+            "Invalid Credentials",
+            "Invalid username or password.",
+            "ERROR",
+            1
+        );
     }
 }
 
-// Generic SystemFlag for error messages and others.
-
+/**
+ * Global flags array for system messages.
+ *
+ * This array holds system flags that can be used for error messages, warnings, and other notifications.
+ */
 $flags = [];
 
-function SystemFlag($MessageTitle, $SystemMessage, $Message_Type, $UserFacing) {
+/**
+ * Set a system flag for messaging.
+ *
+ * This function sets a system flag with a title, message, type, and visibility setting.
+ * The flag is stored in the global $flags array.
+ *
+ * @param string $MessageTitle  The title of the message.
+ * @param string $SystemMessage The content of the message.
+ * @param string $Message_Type  The type of the message (e.g., "ERROR", "WARNING").
+ * @param int    $UserFacing    Whether the message is user-facing (1) or not (0).
+ *
+ * @return void
+ */
+function SystemFlag($MessageTitle, $SystemMessage, $Message_Type, $UserFacing)
+{
     global $flags;
+
+    // Append the new flag to the global flags array
     $flags[] = [
-        'title' => $MessageTitle,
-        'message' => $SystemMessage,
-        'type' => $Message_Type,
-        'userfacing' => $UserFacing
+        "title" => $MessageTitle,
+        "message" => $SystemMessage,
+        "type" => $Message_Type,
+        "userfacing" => $UserFacing,
     ];
 }
-
-
-
 
 /**
  * Make an API call to OpenAI to generate a response.
@@ -295,17 +381,18 @@ function SystemFlag($MessageTitle, $SystemMessage, $Message_Type, $UserFacing) {
  * @param string $prompt The user message prompt.
  * @return string The AI response.
  */
-function openaiApiCall($prompt) {
+function openaiApiCall($prompt)
+{
     $api_key = OPENAI_API_KEY;
     $engine = ENGINE_NAME;
-    $max_tokens = MAX_TOKENS;  // Retrieve max tokens from config.php
-    $temperature = TEMPERATURE;  // Retrieve temperature from config.php
+    $max_tokens = MAX_TOKENS; // Retrieve max tokens from config.php
+    $temperature = TEMPERATURE; // Retrieve temperature from config.php
     $url = "https://api.openai.com/v1/engines/$engine/completions";
 
     $data = json_encode([
-        'prompt' => $prompt,
-        'max_tokens' => $max_tokens,
-        'temperature' => $temperature  // Add temperature parameter
+        "prompt" => $prompt,
+        "max_tokens" => $max_tokens,
+        "temperature" => $temperature, // Add temperature parameter
     ]);
 
     $ch = curl_init($url);
@@ -313,29 +400,31 @@ function openaiApiCall($prompt) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Content-Type: application/json",
-        "Authorization: Bearer $api_key"
+        "Authorization: Bearer $api_key",
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
     $response = curl_exec($ch);
     curl_close($ch);
 
- 
     $response_data = json_decode($response, true);
-if (isset($response_data['choices'][0]['text'])) {
-    $aiResponse = $response_data['choices'][0]['text'];
-    $aiResponse = trim($aiResponse);  // Remove any extra characters or formatting
-    
-    $promptTokens = $response_data['usage']['prompt_tokens'];
-    $completionTokens = $response_data['usage']['completion_tokens'];
-    $totalTokens = $response_data['usage']['total_tokens'];
-    $model = $response_data['model'];
-    
-} else {
-    SystemFlag('API ERROR', 'API OUTPUT DOES NOT MEET REQUIREMENTS.' , 'ERROR', 1);
-    $aiResponse = $response;
-    var_dump($aiResponse);
-}
-return $aiResponse;
-}
+    if (isset($response_data["choices"][0]["text"])) {
+        $aiResponse = $response_data["choices"][0]["text"];
+        $aiResponse = trim($aiResponse); // Remove any extra characters or formatting
 
+        $promptTokens = $response_data["usage"]["prompt_tokens"];
+        $completionTokens = $response_data["usage"]["completion_tokens"];
+        $totalTokens = $response_data["usage"]["total_tokens"];
+        $model = $response_data["model"];
+    } else {
+        SystemFlag(
+            "API ERROR",
+            "API OUTPUT DOES NOT MEET REQUIREMENTS.",
+            "ERROR",
+            1
+        );
+        $aiResponse = $response;
+        var_dump($aiResponse);
+    }
+    return $aiResponse;
+}

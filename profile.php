@@ -2,33 +2,42 @@
 // profile.php
 
 // Include necessary files
-include_once 'functions.php';
+include_once "functions.php";
 
 // Check if the user is logged in
 if (!isLoggedIn()) {
-    header('Location: login.php');
+    header("Location: login.php");
     exit();
 }
 
 // Get user ID from session
-$userId = $_SESSION['user_id'];
+$userId = $_SESSION["user_id"];
 
 // Fetch user details
 $user = getUserById($userId);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Clear chat history
-    if (isset($_POST['clear_chat_history'])) {
+    if (isset($_POST["clear_chat_history"])) {
         $result = migrateAndDeleteChatHistory($userId);
         if (!$result) {
             // Set an error message to be displayed in modal.php
-            SystemFlag('ClearHistoryFailure', 'Failed to clear chat history.' , 'ERROR', 1);
+            SystemFlag(
+                "ClearHistoryFailure",
+                "Failed to clear chat history.",
+                "ERROR",
+                1
+            );
         } else {
-            SystemFlag('ClearHistorySuccess', 'Successfully cleared chat history.' , 'SUCCESS', 1);
+            SystemFlag(
+                "ClearHistorySuccess",
+                "Successfully cleared chat history.",
+                "SUCCESS",
+                1
+            );
         }
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -47,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-<?php include 'header.php'; ?>
+<?php include "header.php"; ?>
 
 <div class="container mt-5 bg-dark text-white">
     <h1 class="text-center">Your Profile</h1>
@@ -142,11 +151,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </div>
 
-<?php include 'modal.php'; ?>
+<?php include "modal.php"; ?>
 
-<button type="submit" name="clear_chat_history" class="btn btn-lg btn-danger btn-block">Clear Chat History</button>
 
-<?php include 'footer.php'; ?>
+<form action="profile.php" method="post" class="mt-3">
+    <button type="submit" name="clear_chat_history" class="btn btn-lg btn-danger btn-block">Clear Chat History</button>
+</form>
+
+<?php include "footer.php"; ?>
 
 
 </body>

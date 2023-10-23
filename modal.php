@@ -87,27 +87,25 @@ function setColorBasedOnType(type) {
 }
 </script>
 
-<?php
-// Check if there are any flags to display
+<?php // Check if there are any flags to display
 if (!empty($flags)) {
-    echo '<script>';
+    echo "<script>";
     echo 'document.addEventListener("DOMContentLoaded", function() {';
     // Loop through each flag
     foreach ($flags as $flag) {
         // Only display the flag if it's user-facing
-        if ($flag['userfacing'] == 1) {
-            echo "document.getElementById('messagePopupTitle').textContent = '{$flag['title']}';
-                  document.getElementById('messagePopupText').textContent = '{$flag['message']}';
+        if ($flag["userfacing"] == 1) {
+            echo "document.getElementById('messagePopupTitle').textContent = '{$flag["title"]}';
+                  document.getElementById('messagePopupText').textContent = '{$flag["message"]}';
                   document.getElementById('messagePopup').classList.add('show');";
         } else {
             // Log non-user-facing flags to the console
-            echo "console.log('{$flag['type']}: {$flag['title']} - {$flag['message']}');";
+            echo "console.log('{$flag["type"]}: {$flag["title"]} - {$flag["message"]}');";
         }
     }
-    echo '});';
-    echo '</script>';
-}
-?>
+    echo "});";
+    echo "</script>";
+} ?>
 
 
 
