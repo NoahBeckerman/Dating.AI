@@ -166,7 +166,7 @@ function storeChatRecord($userId, $personalityId, $message, $response) {
  * @param int $personalityId The personality ID.
  * @return string The AI response.
  */
-function sendMessage($message, $personalityId) {
+function sendMessage($userId, $message, $personalityId) {
     $personality = getPersonalityById($personalityId);
     $prompt = $personality['description'] . "\nUser: " . $message;
     $response = openaiApiCall($prompt);
@@ -248,5 +248,14 @@ function openaiApiCall($prompt) {
     curl_close($ch);
 
     $response_data = json_decode($response, true);
-    return $response_data['choices'][0]['text'];
+    if (isset($response['choices'][0]['text'])) {
+        $aiResponse = $response['choices'][0]['text'];
+    } else {
+        SystemFlag('API ERROR', 'API OUTPUT DOES NOT MEET REQUIREMENTS.' , 'ERROR', 1);
+        $aiResponse = $response ;
+    var_dump($aiResponse);
+    }
+    return $aiResponse;
 }
+
+//{ "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations", "id": "cmpl-8Ci9IAnaWDuEPqJAU8Gp8y3AhVSpL", "object": "text_completion", "created": 1698040336, "model": "text-ada-001", "choices": [ { "text": "\n\n\nHi! I'm here by the way?", "index": 0, "logprobs": null, "finish_reason": "stop" } ], "usage": { "prompt_tokens": 15, "completion_tokens": 12, "total_tokens": 27 } }

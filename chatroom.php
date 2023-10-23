@@ -19,9 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve the form data
     $message = $_POST['message'];
     // Send the message and get the response
-    $response = sendMessage($message, $personalityId);
-    // Store the chat record in the database
     $userId = $_SESSION['user_id'];
+    $response = sendMessage($userId, $message, $personalityId);
+    // Store the chat record in the database
     storeChatRecord($userId, $personalityId, $message, $response);
 }
 
@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ?>
             </ul>
         </div>
+        <?php include 'modal.php'; ?>
         <div class="chat-window">
             <h2>Open Conversation</h2>
             <div class="chat-messages">
