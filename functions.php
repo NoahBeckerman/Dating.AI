@@ -199,6 +199,67 @@ function getPersonalityById($personalityId) {
 }
 
 
+/**
+ * Get a user by ID.
+ *
+ * @param int $userId The user ID.
+ * @return array|null The user data or null if not found.
+ */
+function getUserById($userId) {
+    $query = "SELECT * FROM users WHERE id = ?";
+    $result = executeQuery($query, [$userId]);
+    return $result[0] ?? null;
+}
+/**
+ * Migrate and delete user's chat history.
+ *
+ * @param int $userId The ID of the user whose chat history needs to be migrated and deleted.
+ * @return bool True if the operation is successful, false otherwise.
+ */
+function migrateAndDeleteChatHistory($userId) {
+    // SQL query to select chat history for the specific user
+    $selectQuery = "SELECT * FROM chat_history WHERE userId = :userId";
+    
+    // Execute the query
+    $chatHistory = executeQuery($selectQuery, ['userId' => $userId]);
+    
+    if ($chatHistory === false) {
+        // Log the error or handle it as needed
+        SystemFlag('ClearHistoryFailure', 'Unable to fetch chat history.' , 'ERROR', 1);
+        return false;
+    }
+    
+    // SQL query to insert chat history into UserDeletedConversation table
+    $insertQuery = "INSERT INTO UserDeletedConversation (userId, message, timestamp) VALUES (:userId, :message, :timestamp)";
+    
+    // Migrate each chat record
+    foreach ($chatHistory as $record) {
+        $params = [
+            'userId' => $record['userId'],
+            'message' => $record['message'],
+            'timestamp' => $record['timestamp']
+        ];
+        
+        $insertResult = executeNonQuery($insertQuery, $params);
+        
+        if (!$insertResult) {
+            // Log the error or handle it as needed
+            SystemFlag('ClearHistoryFailure', 'Unable to migrate/copy chat history.' , 'ERROR', 1);
+            return false;
+        }
+    }
+    
+    // SQL query to delete chat history from ChatHistory table
+    $deleteQuery = "DELETE FROM ChatHistory WHERE userId = :userId";
+    
+    // Execute the query
+    $deleteResult = executeNonQuery($deleteQuery, ['userId' => $userId]);
+    
+    return $deleteResult;
+}
+
+
+
 function userLogin($usernameOrEmail, $password) {
     $user = getUserByUsernameOrEmail($usernameOrEmail);
     if ($user && password_verify($password, $user['password'])) {

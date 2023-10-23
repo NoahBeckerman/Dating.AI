@@ -56,6 +56,18 @@ CREATE TABLE IF NOT EXISTS chat_history (
     FOREIGN KEY (personality_id) REFERENCES personalities(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Create UserDeletedConversation table if it doesn't exist
+CREATE TABLE IF NOT EXISTS UserDeletedConversation (
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT(11) UNSIGNED,
+    personality_id INT(11) UNSIGNED,
+    message TEXT NOT NULL,
+    response TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (personality_id) REFERENCES personalities(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Test data for users table
 INSERT INTO users (email, username, password, addr1, addr2, zip, state, country, first_name, last_name, subscription, role, banned, signup_date, last_login, total_messages_sent, total_cost_of_queries) VALUES
 ('john.doe@example.com', 'JohnDoe', 'password123', '123 Main St', 'Apt 4', '12345', 'NY', 'USA', 'John', 'Doe', 1, 0, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 10, 5.00),
