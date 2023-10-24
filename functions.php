@@ -27,6 +27,8 @@ if (session_status() == PHP_SESSION_NONE) {
  * @param array  $params Optional parameters for the query.
  *
  * @return array|bool The result set as an associative array, or false on failure.
+ *
+ * Note: This function is designed to handle SELECT queries. It is not intended for queries that modify the database.
  */
 function executeQuery($query, $params = [])
 {
@@ -40,6 +42,7 @@ function executeQuery($query, $params = [])
  * @param string $query The SQL query.
  * @param array $params The query parameters.
  * @return bool True if the statement executed successfully, false otherwise.
+ * Note: This function is designed to handle SQL statements that do not return a result set, such as INSERT, UPDATE, and DELETE queries.
  */
 function executeNonQuery($query, $params = [])
 {
@@ -51,6 +54,8 @@ function executeNonQuery($query, $params = [])
  * Check if the user is logged in.
  *
  * @return bool True if the user is logged in, false otherwise.
+ *
+ * Note: The function checks for the presence of 'user_id' in the session, which should be set upon successful user authentication.
  */
 function isLoggedIn()
 {
@@ -85,6 +90,8 @@ function logout()
 
 /**
  * Create the database, tables, and test data if they do not exist.
+ * Note: If the database already exists, this function will not attempt to re-import it.
+ 
  */
 function importDatabase()
 {
@@ -115,11 +122,22 @@ function getChatHistory($userId)
     return executeQuery($query, [$userId]);
 }
 
-
-function getChatHistoryMEMORY($userId, $personalityId) {
+/**
+ * Get chat history for a user and a specific personality, limited to the last 5 messages.
+ *
+ * This function fetches the last 5 chat messages between a user and a specific personality.
+ * The messages are returned in reverse order to have the latest messages at the end.
+ *
+ * @param int $userId The user ID.
+ * @param int $personalityId The personality ID.
+ * @return array|bool The reversed array of the last 5 chat messages, or false on failure.
+ * Note: The function name ends with "MEMORY" to indicate that it fetches a limited set of recent chat messages for performance reasons.
+ */
+function getChatHistoryMEMORY($userId, $personalityId)
+{
     // SQL query to fetch chat history
     $sql = "SELECT * FROM chat_history WHERE user_id = ? AND personality_id = ? ORDER BY timestamp DESC LIMIT 5";
-    
+
     // Execute the query
     $result = executeQuery($sql, [$userId, $personalityId]);
 
@@ -130,7 +148,6 @@ function getChatHistoryMEMORY($userId, $personalityId) {
         return false;
     }
 }
-
 
 /**
  * Get the previous chats for a user.
@@ -203,30 +220,31 @@ function storeChatRecord($userId, $personalityId, $message, $response)
 
 /**
  * Send a message to the AI and receive a response.
- * 
+ *
  * @param int $userId The ID of the user sending the message.
  * @param string $message The message text from the user.
  * @param int $personalityId The ID of the AI personality to interact with.
- * 
+ *
  * @return string The AI's response.
- * 
+ *
  * This function performs several key tasks:
  * 1. Retrieves the context for the user and the AI personality.
  * 2. Limits the conversation history to manage token usage.
  * 3. Constructs a comprehensive prompt for the AI, including user context, personality context, and conversation history.
  * 4. Makes an API call to OpenAI to generate the AI's response.
- * 
+ *
  * The AI's response is based on the constructed prompt, which includes:
  * - User context like username and preferences.
  * - Personality context including role-playing guidelines and character attributes.
  * - Limited conversation history for context.
- * 
+ *
  * The function assumes that the following helper functions exist and return the expected types of data:
  * - getPersonalityById()
  * - getUserById()
  * - getChatHistory()
- * 
+ *
  * The OpenAI API call is made through the openaiApiCall() function.
+ * Note: This function assumes the existence of helper functions like getPersonalityById(), getUserById(), and getChatHistory(). Make sure these functions are implemented and accessible.
  */
 function sendMessage($userId, $message, $personalityId)
 {
@@ -244,49 +262,51 @@ function sendMessage($userId, $message, $personalityId)
     $context = "======";
     $context .= "\n";
     $context .= "[Users Context]\n";
-    $context .= "First Name: {$user['first_name']}, Last Name: {$user['last_name']}, Age: {$user['age']}, Preferences: {$user['preferences']}\n";
+    $context .= "First Name: {$user["first_name"]}, Last Name: {$user["last_name"]}, Age: {$user["age"]}, Preferences: {$user["preferences"]}\n";
     $context .= "\n";
     $context .= "\n=====";
     $context .= "\n";
     $context .= "[Your Personality Context]\n";
     $context .= "\n";
-    $context .= "Description: {$personality['description']}\n";
+    $context .= "Description: {$personality["description"]}\n";
     $context .= "\n";
-    $context .= "Notes: {$personality['notes']}\n";
+    $context .= "Notes: {$personality["notes"]}\n";
     $context .= "\n";
-    $context .= "Likes: {$personality['likes']}\n";
+    $context .= "Likes: {$personality["likes"]}\n";
     $context .= "\n";
-    $context .= "Dislikes: {$personality['dislikes']}\n";
+    $context .= "Dislikes: {$personality["dislikes"]}\n";
     $context .= "\n";
-    $context .= "Sex: {$personality['sex']}\n";
+    $context .= "Sex: {$personality["sex"]}\n";
     $context .= "\n";
-    $context .= "Location: {$personality['location']}\n";
+    $context .= "Location: {$personality["location"]}\n";
     $context .= "\n";
     $context .= "\n===";
     $context .= "\n";
-    $context .= "Reminder and context: You are pretending and roleplaying to be {$personality['first_name']} {$personality['last_name']}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT.\n";
-    $context .= "\n";  
+    $context .= "Reminder and context: You are pretending and roleplaying to be {$personality["first_name"]} {$personality["last_name"]}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT.\n";
+    $context .= "\n";
     $context .= "[Prior Conversation History With The User]\n";
-// Fetch Limited Conversation History
-$chatHistory = getChatHistoryMEMORY($userId, $personalityId);
+    // Fetch Limited Conversation History
+    $chatHistory = getChatHistoryMEMORY($userId, $personalityId);
 
-// If you still want to limit it to the last 5 messages, you can use array_slice
-$chatHistory = array_slice($chatHistory, 0, 5);
+    // If you still want to limit it to the last 5 messages, you can use array_slice
+    $chatHistory = array_slice($chatHistory, 0, 5);
 
-// Append the chat history to the context
-foreach ($chatHistory as $chat) {
-    $context .= "User: {$chat['message']}\n";
-    $context .= "{$chat['response']}\n";
-}
+    // Append the chat history to the context
+    foreach ($chatHistory as $chat) {
+        $context .= "User: {$chat["message"]}\n";
+        $context .= "{$chat["response"]}\n";
+    }
 
-    
     $engine = explode("\n", $prePrompt)[0]; // Assuming the engine name is the first line in pre_prompt
 
     // Check if the engine is a chat model
-    if (strpos($engine, 'gpt-4') !== false || strpos($engine, 'gpt-3.5') !== false) {
+    if (
+        strpos($engine, "gpt-4") !== false ||
+        strpos($engine, "gpt-3.5") !== false
+    ) {
         $messages = [
             ["role" => "system", "content" => $context],
-            ["role" => "user", "content" => ('Users Message: ' . $message)]
+            ["role" => "user", "content" => ("Users Message: " . $message)],
         ];
         $prompt = null;
     } else {
@@ -300,23 +320,30 @@ foreach ($chatHistory as $chat) {
 
     return $response;
 }
-
+/**
+ * Retrieve the token limit for a specific personality ID.
+ *
+ * This function maps personality IDs to their respective token limits.
+ * It returns the token limit for the given personality ID.
+ *
+ * @param int $personalityId The personality ID.
+ * @return int|null The token limit for the personality, or null if not found.
+ */
 function getTokenLimitByPersonalityId($personalityId)
 {
     // Mapping of personality IDs to token limits
     $tokenLimits = [
-        'gpt-4-32k' => 32768,
-        'gpt-4' => 8192,
-        'gpt-3.5-turbo-16k' => 16384,
-        'gpt-3.5-turbo' => 4096,
-        'text-ada-001' => 2049,
-        'text-davinci-003' => 4096
+        "gpt-4-32k" => 32768,
+        "gpt-4" => 8192,
+        "gpt-3.5-turbo-16k" => 16384,
+        "gpt-3.5-turbo" => 4096,
+        "text-ada-001" => 2049,
+        "text-davinci-003" => 4096,
         // Add other models here
     ];
 
     return $tokenLimits[$personalityId] ?? null;
 }
-
 
 /**
  * Get the pre_prompt for a specific personality ID.
@@ -357,15 +384,14 @@ function getUserById($userId)
     return $result[0] ?? null;
 }
 /**
- * Migrate and Delete User's Chat History.
+ * Migrate and delete a user's chat history.
  *
- * This function is responsible for migrating the chat history of a specific user
- * to a separate table for deleted conversations. After successful migration,
- * the chat history is deleted from the original table.
+ * This function migrates the chat history of a specific user to a separate table for deleted conversations.
+ * After successful migration, the chat history is deleted from the original table.
  *
  * @param int $userId The unique identifier of the user.
- *
  * @return bool True if the operation is successful, false otherwise.
+ * Note: If the migration of chat history fails, the function will not proceed to delete the original chat history.
  */
 function migrateAndDeleteChatHistory($userId)
 {
@@ -424,81 +450,133 @@ function migrateAndDeleteChatHistory($userId)
     return $deleteResult;
 }
 
-// Sanitize user input to prevent MySQL injection
-function sanitizeInput($input) {
+/**
+ * Sanitize user input to prevent security vulnerabilities such as SQL injection.
+ *
+ * This function takes a user input string and applies various sanitization techniques.
+ * It trims the string, removes backslashes, and converts special characters to HTML entities.
+ *
+ * @param string $input The user input to be sanitized.
+ * @return string The sanitized user input.
+ * Note: This function aims to mitigate common vulnerabilities like SQL injection and Cross-Site Scripting (XSS) by sanitizing user input.
+ */
+function sanitizeInput($input)
+{
     $input = trim($input);
     $input = stripslashes($input);
     $input = htmlspecialchars($input);
     return $input;
-  }
+}
 
-
-  //validates user signup data
-  function validateSignupInput($username, $email, $password) {
+/**
+ * Validate user signup data including username, email, and password.
+ *
+ * This function takes the username, email, and password provided during user signup,
+ * and validates each based on specific criteria.
+ *
+ * @param string $username The username to be validated.
+ * @param string $email The email to be validated.
+ * @param string $password The password to be validated.
+ * @return string A string indicating the validation result.
+ *
+ * Note:
+ * - Username should only contain alphanumeric characters and underscores.
+ * - Email should be a valid email format.
+ * - Password should be at least 8 characters long.
+ */
+function validateSignupInput($username, $email, $password)
+{
     // Validate username
     if (empty($username) || !preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-        return('Invalid_Usernamme');
+        return "Invalid_Usernamme";
     }
-  
+
     // Validate email
     if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return('Invalid_Email');
+        return "Invalid_Email";
     }
-  
+
     // Validate password
     if (empty($password) || strlen($password) < 8) {
-        return('Invalid_Password');
+        return "Invalid_Password";
     }
-  
-    return('Validated');
-  }
 
-  // Validate either username or email based on the input for login
-function validateUsernameOrEmail($usernameOrEmail, $password) {
+    return "Validated";
+}
+
+/**
+ * Validate either username or email based on the input for login.
+ *
+ * This function determines whether the provided input is a username or an email,
+ * and validates it along with the password for user login.
+ *
+ * @param string $usernameOrEmail The username or email to be validated.
+ * @param string $password The password to be validated.
+ * @return string A string indicating the validation result.
+ */
+function validateUsernameOrEmail($usernameOrEmail, $password)
+{
     // Determine if input is email or username
     $isEmail = filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL);
-  
+
     // Validate email
-    if ($isEmail && (empty($usernameOrEmail) || !filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL))) {
-        return('Invalid_Email_Format');
+    if (
+        $isEmail &&
+        (empty($usernameOrEmail) ||
+            !filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL))
+    ) {
+        return "Invalid_Email_Format";
     }
 
-    if($isEmail){
- // Check if email exists in the database
- $query = "SELECT * FROM users WHERE email = ?";
- $params = [$usernameOrEmail];
- $result = executeQuery($query, $params);
- if (count($result) === 0) {
-   return 'Invalid_Email';
- }
-}    
-  
+    if ($isEmail) {
+        // Check if email exists in the database
+        $query = "SELECT * FROM users WHERE email = ?";
+        $params = [$usernameOrEmail];
+        $result = executeQuery($query, $params);
+        if (count($result) === 0) {
+            return "Invalid_Email";
+        }
+    }
+
     // Validate username
     if (!$isEmail) {
-        if (empty($usernameOrEmail) || !preg_match('/^[a-zA-Z0-9_]+$/', $usernameOrEmail)) {
-          return 'Invalid_Username_Format';
+        if (
+            empty($usernameOrEmail) ||
+            !preg_match('/^[a-zA-Z0-9_]+$/', $usernameOrEmail)
+        ) {
+            return "Invalid_Username_Format";
         }
         // Check if username exists in the database
         $query = "SELECT * FROM users WHERE username = ?";
         $params = [$usernameOrEmail];
         $result = executeQuery($query, $params);
         if (count($result) === 0) {
-          return 'Invalid_Username';
+            return "Invalid_Username";
         }
-      }
-    
-  
+    }
+
     // Validate password
     if (empty($password) || strlen($password) < 8) {
-        return('Invalid_Password_Format');
+        return "Invalid_Password_Format";
     }
-  
-    return('Validated');
-  }
 
-function verifyPassword($password, $hashedPassword) {
+    return "Validated";
+}
+
+/**
+ * Verify the provided password against the hashed password.
+ *
+ * This function uses PHP's password_verify to check if the provided password
+ * matches the hashed password stored in the database.
+ *
+ * @param string $password The plaintext password provided by the user.
+ * @param string $hashedPassword The hashed password stored in the database.
+ * @return bool True if the password is verified, otherwise false.
+ */
+function verifyPassword($password, $hashedPassword)
+{
     return password_verify($password, $hashedPassword);
-  }
+}
 
 /**
  * Authenticate a user and initiate a session.
@@ -516,29 +594,20 @@ function userLogin($usernameOrEmail, $password)
 {
     // Fetch user data based on username or email
     $user = getUserByUsernameOrEmail($usernameOrEmail);
-  // $user = ARRAY[{ID} : 1 , {USERNAME} : Administrator ..]
-  
-  
+    // $user = ARRAY[{ID} : 1 , {USERNAME} : Administrator ..]
+
     // Verify the provided password against the stored hash
-  if (!verifyPassword($password, $user['password'])) {
-            // Set an error flag for invalid credentials
-            SystemFlag(
-                "Invalid Password",
-                "Incorrect password.",
-                "ERROR",
-                1
-            );
-  }
-  else {
-     // Set the user ID in the session to log in the user
-    $_SESSION["user_id"] = $user["id"];
+    if (!verifyPassword($password, $user["password"])) {
+        // Set an error flag for invalid credentials
+        SystemFlag("Invalid Password", "Incorrect password.", "ERROR", 1);
+    } else {
+        // Set the user ID in the session to log in the user
+        $_SESSION["user_id"] = $user["id"];
 
-    // Redirect to the index page
-    header("Location: index.php");
-    exit();
-  }
-
-
+        // Redirect to the index page
+        header("Location: index.php");
+        exit();
+    }
 }
 
 /**
@@ -574,8 +643,18 @@ function SystemFlag($MessageTitle, $SystemMessage, $Message_Type, $UserFacing)
     ];
 }
 
-
-function estimate_tokens($text, $method = "max") {
+/**
+ * Estimate the number of tokens in a given text.
+ *
+ * This function estimates the number of tokens in a text string based on
+ * either word count or character count, depending on the method specified.
+ *
+ * @param string $text The text to estimate tokens for.
+ * @param string $method The method to use for token estimation ("average", "words", "chars", "max", "min").
+ * @return int The estimated number of tokens.
+ */
+function estimate_tokens($text, $method = "max")
+{
     // Initialize word and character counts
     $word_count = str_word_count($text);
     $char_count = strlen($text);
@@ -608,16 +687,20 @@ function estimate_tokens($text, $method = "max") {
             return "Invalid method. Use 'average', 'words', 'chars', 'max', or 'min'.";
     }
 
-    return (int)$output;
+    return (int) $output;
 }
 
-
 /**
- * Make an API call to OpenAI to generate a response.
+ * Make an API call to OpenAI to generate a response based on a prompt.
+ *
+ * This function takes a user prompt and an engine type, and makes an API call to OpenAI.
+ * It returns the generated text as a response.
  *
  * @param string $prompt The user message prompt.
  * @param string $engine The engine to use for the API call.
- * @return string The AI response.
+ * @param array $messages Optional array of messages for conversational context.
+ * @param string $personality The personality setting for the API call.
+ * @return string The generated response from the API.
  */
 function openaiApiCall($prompt, $engine, $messages = null, $personality)
 {
@@ -625,27 +708,33 @@ function openaiApiCall($prompt, $engine, $messages = null, $personality)
     $max_tokens = getTokenLimitByPersonalityId($engine);
     $temperature = TEMPERATURE;
 
-    $token_estimate = ($messages !== null) ? estimate_tokens(json_encode($messages)) : estimate_tokens($prompt);
+    $token_estimate =
+        $messages !== null
+            ? estimate_tokens(json_encode($messages))
+            : estimate_tokens($prompt);
     $adjusted_max_tokens = min($max_tokens, 1800 - $token_estimate); // 2049 is the maximum token limit for the model
 
-
     // Prepare API call data based on the engine type
-    $data = strpos($engine, 'gpt-4') !== false || strpos($engine, 'gpt-3.5') !== false ?
-     json_encode([
-            "model" => $engine,
-            "messages" => $messages,
-            "max_tokens" => $adjusted_max_tokens,
-            "temperature" => $temperature
-        ]) :
-        json_encode([
-            "prompt" => $prompt,
-            "max_tokens" => $adjusted_max_tokens,
-            "temperature" => $temperature
-        ]);
+    $data =
+        strpos($engine, "gpt-4") !== false ||
+        strpos($engine, "gpt-3.5") !== false
+            ? json_encode([
+                "model" => $engine,
+                "messages" => $messages,
+                "max_tokens" => $adjusted_max_tokens,
+                "temperature" => $temperature,
+            ])
+            : json_encode([
+                "prompt" => $prompt,
+                "max_tokens" => $adjusted_max_tokens,
+                "temperature" => $temperature,
+            ]);
 
-    $url = strpos($engine, 'gpt-4') !== false || strpos($engine, 'gpt-3.5') !== false ?
-        "https://api.openai.com/v1/chat/completions" :
-        "https://api.openai.com/v1/engines/$engine/completions";
+    $url =
+        strpos($engine, "gpt-4") !== false ||
+        strpos($engine, "gpt-3.5") !== false
+            ? "https://api.openai.com/v1/chat/completions"
+            : "https://api.openai.com/v1/engines/$engine/completions";
 
     // Initialize cURL
     $ch = curl_init($url);
@@ -653,7 +742,7 @@ function openaiApiCall($prompt, $engine, $messages = null, $personality)
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Content-Type: application/json",
-        "Authorization: Bearer $api_key"
+        "Authorization: Bearer $api_key",
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
@@ -679,7 +768,7 @@ function openaiApiCall($prompt, $engine, $messages = null, $personality)
         $aiResponse = $response;
         var_dump($aiResponse);
     }
-   
+
     $aiResponse = str_replace("[Your Reply]", "", $aiResponse);
     $aiResponse = str_replace("[Your Response]", "", $aiResponse);
     $aiResponse = trim($aiResponse);
@@ -688,6 +777,13 @@ function openaiApiCall($prompt, $engine, $messages = null, $personality)
     //$completionTokens = $response_data["usage"]["completion_tokens"];
     //$totalTokens = $response_data["usage"]["total_tokens"];
     //$model = $response_data["model"];
-    var_dump('<br> MAX TOKENS: ' . $max_tokens . ' TOKENS EST: ' . $token_estimate . ' Actuall Tokens: ' . $response_data["usage"]["prompt_tokens"]);
-    return $aiResponse . '<br>';
+    var_dump(
+        "<br> MAX TOKENS: " .
+            $max_tokens .
+            " TOKENS EST: " .
+            $token_estimate .
+            " Actuall Tokens: " .
+            $response_data["usage"]["prompt_tokens"]
+    );
+    return $aiResponse . "<br>";
 }
