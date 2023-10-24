@@ -4,20 +4,43 @@ require_once "functions.php";
 if (isLoggedIn()) {
     redirect("index.php");
 }
+
 // Handle form submission for user registration
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Retrieve the form data
-    $email = $_POST["email"];
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    // Validate the form data
-    if (empty($email) || empty($username) || empty($password)) {
-        SystemFlag(
-            "MissingCredentials",
-            "Please fill in all the requested feilds.",
-            "ERROR",
-            1
-        );
+    $username = sanitizeInput($_POST["username"]);
+    $email = sanitizeInput($_POST["email"]);
+    $password = sanitizeInput($_POST["password"]);
+
+    $validationResult = validateSignupInput($username, $email, $password);
+
+    if ($validationResult !== "Validated") {
+        if ($validationResult == "Invalid_Username") {
+            SystemFlag(
+                "Invalid Username",
+                "This username is invalid. Please use atleast 4 characters.",
+                "ERROR",
+                1
+            );
+        }
+
+        if ($validationResult == "Invalid_Email") {
+            SystemFlag(
+                "Invalid Email",
+                "This Email is invalid. Please use a REAL email.",
+                "ERROR",
+                1
+            );
+        }
+
+        if ($validationResult == "Invalid_Password") {
+            SystemFlag(
+                "Invalid Password",
+                "This password is invalid. Please use atleast 8 characters.",
+                "ERROR",
+                1
+            );
+        }
     } else {
         // Hash the password for security
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);

@@ -424,6 +424,82 @@ function migrateAndDeleteChatHistory($userId)
     return $deleteResult;
 }
 
+// Sanitize user input to prevent MySQL injection
+function sanitizeInput($input) {
+    $input = trim($input);
+    $input = stripslashes($input);
+    $input = htmlspecialchars($input);
+    return $input;
+  }
+
+
+  //validates user signup data
+  function validateSignupInput($username, $email, $password) {
+    // Validate username
+    if (empty($username) || !preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        return('Invalid_Usernamme');
+    }
+  
+    // Validate email
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return('Invalid_Email');
+    }
+  
+    // Validate password
+    if (empty($password) || strlen($password) < 8) {
+        return('Invalid_Password');
+    }
+  
+    return('Validated');
+  }
+
+  // Validate either username or email based on the input for login
+function validateUsernameOrEmail($usernameOrEmail, $password) {
+    // Determine if input is email or username
+    $isEmail = filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL);
+  
+    // Validate email
+    if ($isEmail && (empty($usernameOrEmail) || !filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL))) {
+        return('Invalid_Email_Format');
+    }
+
+    if($isEmail){
+ // Check if email exists in the database
+ $query = "SELECT * FROM users WHERE email = ?";
+ $params = [$usernameOrEmail];
+ $result = executeQuery($query, $params);
+ if (count($result) === 0) {
+   return 'Invalid_Email';
+ }
+}    
+  
+    // Validate username
+    if (!$isEmail) {
+        if (empty($usernameOrEmail) || !preg_match('/^[a-zA-Z0-9_]+$/', $usernameOrEmail)) {
+          return 'Invalid_Username_Format';
+        }
+        // Check if username exists in the database
+        $query = "SELECT * FROM users WHERE username = ?";
+        $params = [$usernameOrEmail];
+        $result = executeQuery($query, $params);
+        if (count($result) === 0) {
+          return 'Invalid_Username';
+        }
+      }
+    
+  
+    // Validate password
+    if (empty($password) || strlen($password) < 8) {
+        return('Invalid_Password_Format');
+    }
+  
+    return('Validated');
+  }
+
+function verifyPassword($password, $hashedPassword) {
+    return password_verify($password, $hashedPassword);
+  }
+
 /**
  * Authenticate a user and initiate a session.
  *
@@ -440,24 +516,29 @@ function userLogin($usernameOrEmail, $password)
 {
     // Fetch user data based on username or email
     $user = getUserByUsernameOrEmail($usernameOrEmail);
-
+  // $user = ARRAY[{ID} : 1 , {USERNAME} : Administrator ..]
+  
+  
     // Verify the provided password against the stored hash
-    if ($user && password_verify($password, $user["password"])) {
-        // Set the user ID in the session to log in the user
-        $_SESSION["user_id"] = $user["id"];
+  if (!verifyPassword($password, $user['password'])) {
+            // Set an error flag for invalid credentials
+            SystemFlag(
+                "Invalid Password",
+                "Incorrect password.",
+                "ERROR",
+                1
+            );
+  }
+  else {
+     // Set the user ID in the session to log in the user
+    $_SESSION["user_id"] = $user["id"];
 
-        // Redirect to the index page
-        header("Location: index.php");
-        exit();
-    } else {
-        // Set an error flag for invalid credentials
-        SystemFlag(
-            "Invalid Credentials",
-            "Invalid username or password.",
-            "ERROR",
-            1
-        );
-    }
+    // Redirect to the index page
+    header("Location: index.php");
+    exit();
+  }
+
+
 }
 
 /**
