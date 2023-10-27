@@ -18,38 +18,41 @@ if (isset($_POST["personalityId"])) {
 <html>
   <head>
     <title>Dating.AI - Lobby</title>
-    
+
     <?php include "head.php"; ?> <!-- Include the styling/scripts -->
 
   </head>
   <body>
     <?php include "header.php"; ?> <!-- Include the header -->
-    <main>
-        <h2>Browse Personalities</h2>
-        <div class="personalities">
-    <?php
-    // Display the list of personalities
-    $personalities = getPersonalities();
-    foreach ($personalities as $personality) {
-        echo '<div class="personality">';
-        echo '<img src="' .
-            $personality["profile_picture"] .
-            '" alt="Profile Picture">';
-        echo "<h3>" .
-            $personality["first_name"] .
-            " " .
-            $personality["last_name"] .
-            "</h3>";
-        echo "<p>" . $personality["description"] . "</p>";
-        echo '<form method="post" action="lobby.php">';
-        echo '<input type="hidden" name="personalityId" value="' .
-            $personality["id"] .
-            '">';
-        echo '<button type="submit">Chat</button>';
-        echo "</form>";
-        echo "</div>";
-    }
-    ?>
+    <script src="SCRIPTS/lobby.js"></script>
+      <main class="container">
+        <h2 class="text-center">Browse Personalities</h2>
+        <input type="text" id="searchBar" class="form-control" placeholder="Search Personalities...">
+        <div id="carouselContainer" class="carousel slide hidden" data-ride="carousel">
+            <div class="carousel-inner">
+                <!-- Carousel content will be populated here -->
+            </div>
+        </div>
+        <div id="gridContainer" class="row">
+            <?php
+            // Assuming getPersonalities() returns an array of personalities
+            $personalities = getPersonalities();
+            foreach ($personalities as $personality) {
+                echo '<div class="col-md-4 personality">';
+                echo '<div class="card">';
+                echo '<img src="' . $personality["profile_picture"] . '" class="card-img-top" alt="Profile Picture">';
+                echo '<div class="card-body">';
+                echo "<h5 class='card-title'>" . $personality["first_name"] . " " . $personality["last_name"] . "</h5>";
+                echo "<p class='card-text'>" . $personality["description"] . "</p>";
+                echo '<form method="post" action="lobby.php">';
+                echo '<input type="hidden" name="personalityId" value="' . $personality["id"] . '">';
+                echo '<button type="submit" class="btn btn-primary">Chat</button>';
+                echo '</form>';
+                echo '</div>';
+                echo '</div>';
+                echo '</div>';
+            }
+            ?>
         </div>
     </main>
     <?php include "footer.php"; ?> <!-- Include the footer -->
