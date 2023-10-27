@@ -9,8 +9,8 @@
  * @package Dating.AI
  */
 
-require_once "config.php";
-require_once "database.php";
+require_once "BACKEND/CONFIG/config.php";
+require_once "BACKEND/CONFIG/database.php";
 
 // Initialize session if not already started
 if (session_status() == PHP_SESSION_NONE) {
