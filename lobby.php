@@ -39,11 +39,11 @@ if (isset($_POST["personalityId"])) {
             $personalities = getPersonalities();
             foreach ($personalities as $personality) {
                 echo '<div class="col-md-4 personality">';
-                echo '<div class="card">';
-                echo '<img src="' . $personality["profile_picture"] . '" class="card-img-top" alt="Profile Picture">';
-                echo '<div class="card-body">';
-                echo "<h5 class='card-title'>" . $personality["first_name"] . " " . $personality["last_name"] . "</h5>";
-                echo "<p class='card-text'>" . $personality["description"] . "</p>";
+                echo '<div class="lobby-card">';
+                echo '<img src="' . $personality["profile_picture"] . '" class="lobby-card-img-top" alt="Profile Picture">';
+                echo '<div class="lobby-card-body">';
+                echo "<h5 class='lobby-card-title'>" . $personality["first_name"] . " " . $personality["last_name"] . "</h5>";
+                echo "<p class='lobby-card-text'>" . $personality["description"] . "</p>";
                 echo '<form method="post" action="lobby.php">';
                 echo '<input type="hidden" name="personalityId" value="' . $personality["id"] . '">';
                 echo '<button type="submit" class="btn btn-primary">Chat</button>';

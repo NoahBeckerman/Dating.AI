@@ -73,17 +73,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body>
     <?php include "header.php"; ?> <!-- Include the header -->
-    <main>
+    <main class="login-container">
+    <div class="login-form">
         <h2>Sign In</h2>
         <form action="login.php" method="POST">
             <label for="username_or_email">Username or Email:</label>
             <input type="text" id="username_or_email" name="username_or_email" required><br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br>
-            <input type="submit" value="Sign In">
+            <input type="submit" value="Sign In" class="btn-login">
         </form>
         <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
+    </div>
     </main>
+
     <?php include "modal.php"; ?>
     <?php include "footer.php"; ?> <!-- Include the footer -->
 </body>

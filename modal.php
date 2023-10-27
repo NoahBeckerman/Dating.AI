@@ -6,7 +6,7 @@
     <!-- Header with title and close button -->
     <div class="d-flex justify-content-between align-items-center">
       <div id="messagePopupTitle" class="font-weight-bold"></div>
-      <span class="text-white" onclick="closePopup()">x</span>
+      <span class="text-white" onclick="closePopup()">   x</span>
     </div>
     <!-- Message content -->
     <div class="text-center my-3" id="messagePopupText"></div>
