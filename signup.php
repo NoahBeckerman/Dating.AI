@@ -65,24 +65,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body>
     <?php include "header.php"; ?> <!-- Include the header -->
-    <main>
+    <main class="login-container">
+    <div class="login-form">
         <h2>Create an Account</h2>
         <form action="signup.php" method="POST">
-  <div class="form-group">
-    <label for="email">Email:</label>
-    <input type="email" class="form-control" id="email" name="email" required>
-  </div>
-  <div class="form-group">
-    <label for="username">Username:</label>
-    <input type="text" class="form-control" id="username" name="username" required>
-  </div>
-  <div class="form-group">
-    <label for="password">Password:</label>
-    <input type="password" class="form-control" id="password" name="password" required>
-  </div>
-            <input type="submit" value="Sign Up">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+            <input type="submit" value="Sign Up" class="btn-login">
         </form>
-    </main>
+        <p>Already have an account? <a href="login.php">Sign In</a></p>
+    </div>
+</main>
+
     <?php include "footer.php"; ?> <!-- Include the footer -->
 </body>
 </html>
