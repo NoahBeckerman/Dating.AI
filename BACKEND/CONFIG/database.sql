@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     age int,
     preferences VARCHAR(255), 
     password VARCHAR(255) NOT NULL,
+    profile_picture VARCHAR(255),
     addr1 VARCHAR(255),
     addr2 VARCHAR(255),
     zip VARCHAR(10),

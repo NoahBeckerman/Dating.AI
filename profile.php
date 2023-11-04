@@ -100,7 +100,27 @@ if (isset($_POST["update_billing"])) {
     }
 }
 
+if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
+  $username = $_POST['username'];
+  $hashedFolderName = md5($username);
+  $targetFolder = "USER_DATA/" . $hashedFolderName;
   
+  if (!file_exists($targetFolder)) {
+      mkdir($targetFolder, 0777, true);
+  }
+  
+  $timestamp = time();
+  $fileExtension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+  $newFileName = $timestamp . "." . $fileExtension;
+  
+  move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFolder . "/" . $newFileName);
+  
+  // Update the 'profile_picture' column in the database
+  $query = "UPDATE users SET profile_picture = ? WHERE id = ?";
+  $params = [$newFileName, $userId];
+  executeNonQuery($query, $params);
+}
+
 
 }
 ?>
