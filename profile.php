@@ -37,6 +37,71 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             );
         }
     }
+
+   // If update_account button was clicked
+   if (isset($_POST["update_account"])) {
+    $fieldsToUpdate = [];
+    $params = [];
+
+    // Check each field for changes
+    foreach (['username', 'email', 'password', 'age', 'preferences'] as $field) {
+        if ($_POST[$field] !== $user[$field]) {
+            $fieldsToUpdate[] = "$field = ?";
+            $params[] = $_POST[$field];
+        }
+    }
+
+    // If there are fields to update
+    if (!empty($fieldsToUpdate)) {
+        $query = "UPDATE users SET " . implode(", ", $fieldsToUpdate) . " WHERE id = ?";
+        $params[] = $userId;
+
+        executeNonQuery($query, $params);
+       // Set a success message to be displayed in modal.php
+    SystemFlag(
+      "UpdateAccountSuccess",
+      "Change complete.",
+      "SUCCESS",
+      1
+    );
+  
+  
+    }
+}
+
+// If update_billing button was clicked
+if (isset($_POST["update_billing"])) {
+    $fieldsToUpdate = [];
+    $params = [];
+
+    // Check each field for changes
+    foreach (['addr1', 'addr2', 'zip', 'state', 'country', 'first_name', 'last_name'] as $field) {
+        if ($_POST[$field] !== $user[$field]) {
+            $fieldsToUpdate[] = "$field = ?";
+            $params[] = $_POST[$field];
+        }
+    }
+
+    // If there are fields to update
+    if (!empty($fieldsToUpdate)) {
+        $query = "UPDATE users SET " . implode(", ", $fieldsToUpdate) . " WHERE id = ?";
+        $params[] = $userId;
+
+        executeNonQuery($query, $params);
+        
+           // Set a success message to be displayed in modal.php
+    SystemFlag(
+      "UpdateBillingSuccess",
+      "Change complete.",
+      "SUCCESS",
+      1
+  );
+
+    }
+}
+
+  
+
 }
 ?>
 <!DOCTYPE html>
@@ -58,11 +123,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <div id="collapseOne" class="collapse show" data-parent="#accordion">
             <div class="card-body">
               <form action="profile.php" method="post" enctype="multipart/form-data" class="form-signin">
-                 Username <input type="text" name="username" class="form-control" placeholder="Username" required> 
-                 Email <input type="email" name="email" class="form-control" placeholder="Email" required> 
+                 Username <input type="text" name="username" class="form-control" placeholder="Username" value="<?php echo htmlspecialchars($user['username']); ?>" required> 
+                 Email <input type="email" name="email" class="form-control" placeholder="Email" value="<?php echo htmlspecialchars($user['email']); ?>"required> 
                  Password <input type="password" name="password" class="form-control" placeholder="Password" required>
-                 Age <input type="text" name="age" class="form-control" placeholder="" > 
-                 Preferences <input type="text" name="Preferences" class="form-control" placeholder="" > 
+                 Age <input type="text" name="age" class="form-control" placeholder="" value="<?php echo htmlspecialchars($user['age']); ?>" > 
+                 Preferences <input type="text" name="preferences" class="form-control" placeholder="" value="<?php echo htmlspecialchars($user['preferences']); ?>"> 
                   Profile Picture <div class="custom-file">
                   <input type="file" class="custom-file-input" id="profile_picture" name="profile_picture">
                   <label class="custom-file-label" for="profile_picture">Choose Profile Picture</label>
@@ -79,7 +144,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </div>
           <div id="collapseTwo" class="collapse" data-parent="#accordion">
             <div class="card-body">
-              <form action="profile.php" method="post" class="form-signin"> Address Line 1 <input type="text" name="addr1" class="form-control" placeholder="Address Line 1"> Address Line 2 <input type="text" name="addr2" class="form-control" placeholder="Address Line 2"> ZIP Code <input type="text" name="zip" class="form-control" placeholder="ZIP Code"> State <input type="text" name="state" class="form-control" placeholder="State"> Country <input type="text" name="country" class="form-control" placeholder="Country"> First Name <input type="text" name="first_name" class="form-control" placeholder="First Name"> Last Name <input type="text" name="last_name" class="form-control" placeholder="Last Name">
+              <form action="profile.php" method="post" class="form-signin"> 
+                Address Line 1 <input type="text" name="addr1" class="form-control" placeholder="Address Line 1" value="<?php echo htmlspecialchars($user['addr1']); ?>">
+               Address Line 2 <input type="text" name="addr2" class="form-control" placeholder="Address Line 2" value="<?php echo htmlspecialchars($user['addr2']); ?>"> 
+               ZIP Code <input type="text" name="zip" class="form-control" placeholder="ZIP Code" value="<?php echo htmlspecialchars($user['zip']); ?>">
+                State <input type="text" name="state" class="form-control" placeholder="State" value="<?php echo htmlspecialchars($user['state']); ?>">
+                 Country <input type="text" name="country" class="form-control" placeholder="Country" value="<?php echo htmlspecialchars($user['country']); ?>"> 
+                 First Name <input type="text" name="first_name" class="form-control" placeholder="First Name" value="<?php echo htmlspecialchars($user['first_name']); ?>"> 
+                 Last Name <input type="text" name="last_name" class="form-control" placeholder="Last Name" value="<?php echo htmlspecialchars($user['last_name']); ?>">
                 <button type="submit" name="update_billing" class="btn btn-primary">Update Billing</button>
               </form>
             </div>

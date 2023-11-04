@@ -16,6 +16,7 @@
 </div>
 
 
+
 <script>
 function closePopup() {
     document.getElementById('messagePopup').classList.remove('show');
@@ -44,6 +45,8 @@ function setColorBasedOnType(type) {
 </script>
 
 <?php // Check if there are any flags to display
+
+
 if (!empty($flags)) {
     echo "<script>";
     echo 'document.addEventListener("DOMContentLoaded", function() {';
