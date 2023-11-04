@@ -610,12 +610,6 @@ function userLogin($usernameOrEmail, $password)
     }
 }
 
-/**
- * Global flags array for system messages.
- *
- * This array holds system flags that can be used for error messages, warnings, and other notifications.
- */
-$flags = [];
 
 /**
  * Set a system flag for messaging.
@@ -632,10 +626,14 @@ $flags = [];
  */
 function SystemFlag($MessageTitle, $SystemMessage, $Message_Type, $UserFacing)
 {
-    global $flags;
 
-    // Append the new flag to the global flags array
-    $flags[] = [
+
+    if (!isset($_SESSION['flags'])) {
+        $_SESSION['flags'] = [];
+    }
+
+    // Append the new flag to the session flags array
+    $_SESSION['flags'][] = [
         "title" => $MessageTitle,
         "message" => $SystemMessage,
         "type" => $Message_Type,
