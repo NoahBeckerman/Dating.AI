@@ -157,12 +157,13 @@ function getChatHistoryMEMORY($userId, $personalityId)
  */
 function getPreviousChats($userId)
 {
-    $query = "SELECT DISTINCT chat_history.personality_id, personalities.first_name, personalities.last_name
+    $query = "SELECT DISTINCT chat_history.personality_id, personalities.first_name, personalities.last_name, personalities.profile_picture
               FROM chat_history
               INNER JOIN personalities ON chat_history.personality_id = personalities.id
               WHERE chat_history.user_id = ?";
     return executeQuery($query, [$userId]);
 }
+
 
 /**
  * Get the chat messages for a user and personality.
@@ -173,7 +174,7 @@ function getPreviousChats($userId)
  */
 function getChatMessages($userId, $personalityId)
 {
-    $query = "SELECT message, response FROM chat_history
+    $query = "SELECT message, response, user_id FROM chat_history
               WHERE user_id = ? AND personality_id = ?
               ORDER BY timestamp ASC";
     return executeQuery($query, [$userId, $personalityId]);
