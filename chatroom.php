@@ -7,8 +7,16 @@ if (!isLoggedIn()) {
 }
 
 $userId = $_SESSION["user_id"];
-$personalityId = isset($_GET["personalityId"]) ? $_GET["personalityId"] : $_SESSION["personalityId"];
-
+if (isset($_GET["personalityId"])) {
+    $personalityId = $_GET["personalityId"];
+} elseif (isset($_SESSION["personalityId"])) {
+    $personalityId = $_SESSION["personalityId"];
+} else {
+    // Handle the case where personalityId is not available in both GET and SESSION
+    // Redirecting to a default page or showing an error message can be a solution
+    // For now, I'll redirect to the login page as an example
+    redirect("lobby.php");
+}
 // Handle form submission for sending messages
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["message"])) {
     $messageContent = $_POST["message"];
