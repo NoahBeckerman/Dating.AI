@@ -251,7 +251,7 @@ function sendMessage($userId, $message, $personalityId)
 {
     // Fetch Personality Context
     $personality = getPersonalityById($personalityId);
-    $prePrompt = getPromptByPersonalityId($personalityId);
+    $prePrompt = $personality["pre_prompt"];
 
     // Fetch User Context
     $user = getUserById($userId);
@@ -298,27 +298,26 @@ function sendMessage($userId, $message, $personalityId)
         $context .= "{$chat["response"]}\n";
     }
 
-    $engine = explode("\n", $prePrompt)[0]; // Assuming the engine name is the first line in pre_prompt
-
-    // Check if the engine is a chat model
-    if (
-        strpos($engine, "gpt-4") !== false ||
-        strpos($engine, "gpt-3.5") !== false
-    ) {
-        $messages = [
-            ["role" => "system", "content" => $context],
-            ["role" => "user", "content" => ("Users Message: " . $message)],
-        ];
-        $prompt = null;
-    } else {
-        $prompt = $context . "\n[User's Current Message]\n";
-        $prompt .= "User: {$message}";
-        $messages = null;
+    //$engine = $prePrompt; // Assuming the engine name is the first line in pre_prompt
+    $engine = $prePrompt;
+    // Check engine type using a switch-case for better structure
+    switch (true) {
+        case strpos($engine, "gpt-4") !== false:
+        case strpos($engine, "gpt-3.5-turbo-16k") !== false:
+            $messages = [
+                ["role" => "system", "content" => $context],
+                ["role" => "user", "content" => ("Users Message: " . $message)],
+            ];
+            $prompt = null;
+            break;
+        default:
+            $prompt = $context . "\n[User's Current Message]\n";
+            $prompt .= "User: {$message}";
+            $messages = null;
+            break;
     }
-
     // Make the API call
-    $response = openaiApiCall($prompt, $engine, $messages, $personality);
-
+    $response = openaiApiCall($prompt, $messages, $engine, $personalityId);
     return $response;
 }
 /**
@@ -356,7 +355,7 @@ function getPromptByPersonalityId($personalityId)
 {
     $query = "SELECT pre_prompt FROM personalities WHERE id = ?";
     $result = executeQuery($query, [$personalityId]);
-    return $result[0]["pre_prompt"] ?? null;
+    return $result[0] ?? null;
 }
 
 /**
@@ -485,7 +484,7 @@ function sanitizeInput($input)
  * - Email should be a valid email format.
  * - Password should be at least 8 characters long.
  */
-function validateSignupInput($username, $email, $password)
+function validateSignupInput($username, $email, $password, $verify_password)
 {
     // Validate username
     if (empty($username) || !preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
@@ -499,9 +498,14 @@ function validateSignupInput($username, $email, $password)
 
     // Validate password
     if (empty($password) || strlen($password) < 8) {
-        return "Invalid_Password";
+        return "Invalid_Password_Length";
     }
 
+    if ($password !== $verify_password) {
+       
+        return "Invalid_Password_Match"; // Exit early to prevent further processing
+    }
+    
     return "Validated";
 }
 
@@ -701,7 +705,7 @@ function estimate_tokens($text, $method = "max")
  * @param string $personality The personality setting for the API call.
  * @return string The generated response from the API.
  */
-function openaiApiCall($prompt, $engine, $messages = null, $personality)
+function openaiApiCall($prompt, $messages, $engine, $personality)
 {
     $api_key = OPENAI_API_KEY;
     $max_tokens = getTokenLimitByPersonalityId($engine);
@@ -711,29 +715,29 @@ function openaiApiCall($prompt, $engine, $messages = null, $personality)
         $messages !== null
             ? estimate_tokens(json_encode($messages))
             : estimate_tokens($prompt);
-    $adjusted_max_tokens = min($max_tokens, 1800 - $token_estimate); // 2049 is the maximum token limit for the model
+    $adjusted_max_tokens = min($max_tokens, 1800 - $token_estimate); 
 
-    // Prepare API call data based on the engine type
-    $data =
-        strpos($engine, "gpt-4") !== false ||
-        strpos($engine, "gpt-3.5") !== false
-            ? json_encode([
+    // Check engine type using a switch-case for better structure
+    switch (true) {
+        case strpos($engine, "gpt-4") !== false:
+        case strpos($engine, "gpt-3.5-turbo-16k") !== false:
+            $data = json_encode([
                 "model" => $engine,
                 "messages" => $messages,
                 "max_tokens" => $adjusted_max_tokens,
                 "temperature" => $temperature,
-            ])
-            : json_encode([
+            ]);
+            $url = "https://api.openai.com/v1/chat/completions";
+            break;
+        default:
+            $data = json_encode([
                 "prompt" => $prompt,
                 "max_tokens" => $adjusted_max_tokens,
                 "temperature" => $temperature,
             ]);
-
-    $url =
-        strpos($engine, "gpt-4") !== false ||
-        strpos($engine, "gpt-3.5") !== false
-            ? "https://api.openai.com/v1/chat/completions"
-            : "https://api.openai.com/v1/engines/$engine/completions";
+            $url = "https://api.openai.com/v1/engines/$engine/completions";
+            break;
+    }
 
     // Initialize cURL
     $ch = curl_init($url);
@@ -749,6 +753,7 @@ function openaiApiCall($prompt, $engine, $messages = null, $personality)
     $response = curl_exec($ch);
     curl_close($ch);
 
+    
     // Decode JSON response
     $response_data = json_decode($response, true);
 

@@ -8,8 +8,8 @@ if (!isLoggedIn()) {
 // Check if a personalityId was submitted
 // Check if a personalityId was submitted
 if (isset($_POST["personalityId"])) {
-    $_SESSION["personalityId"] = $_POST["personalityId"];
-    redirect("chatroom.php?personalityId=" . $_SESSION["personalityId"]);
+    $_SESSION["personality_id"] = $_POST["personalityId"];
+    redirect("chatroom.php?personality_id=" . $_SESSION["personality_id"]);
 }
 
 // Display the lobby page content

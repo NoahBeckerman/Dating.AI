@@ -11,8 +11,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = sanitizeInput($_POST["username"]);
     $email = sanitizeInput($_POST["email"]);
     $password = sanitizeInput($_POST["password"]);
+    $verify_password = sanitizeInput($_POST["verify_password"]); // Retrieve the verify_password field
 
-    $validationResult = validateSignupInput($username, $email, $password);
+    $validationResult = validateSignupInput($username, $email, $password, $verify_password);
 
     if ($validationResult !== "Validated") {
         if ($validationResult == "Invalid_Username") {
@@ -22,6 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "ERROR",
                 1
             );
+          
+          
         }
 
         if ($validationResult == "Invalid_Email") {
@@ -31,16 +34,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "ERROR",
                 1
             );
+         
         }
 
-        if ($validationResult == "Invalid_Password") {
+        if ($validationResult == "Invalid_Password_Length") {
             SystemFlag(
                 "Invalid Password",
                 "This password is invalid. Please use atleast 8 characters.",
                 "ERROR",
                 1
             );
+           
+    
         }
+        if ($validationResult == "Invalid_Password_Match") {
+        SystemFlag(
+            "Password Mismatch",
+            "The passwords you entered do not match. Please try again.",
+            "ERROR",
+            1
+        );
+        
+       
+    }
     } else {
         // Hash the password for security
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -75,12 +91,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <input type="text" id="username" name="username" required><br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br>
+            <label for="password">Password:</label>
+            <input type="password" id="verify_password" name="verify_password" required><br>
             <input type="submit" value="Sign Up" class="btn-login">
         </form>
         <p>Already have an account? <a href="login.php">Sign In</a></p>
     </div>
 </main>
-
+<?php include "modal.php"; ?>
     <?php include "footer.php"; ?> <!-- Include the footer -->
 </body>
 </html>
