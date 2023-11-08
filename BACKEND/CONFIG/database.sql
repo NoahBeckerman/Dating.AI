@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS system_health (
     recorded_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 -- Create user_activity table if it doesn't exist
 CREATE TABLE IF NOT EXISTS user_activity (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -117,6 +118,29 @@ CREATE TABLE IF NOT EXISTS user_activity (
     FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Table for Subscription Plans
+CREATE TABLE IF NOT EXISTS subscription_plans (
+    plan_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL COMMENT 'Price of the plan',
+    duration INT UNSIGNED NOT NULL COMMENT 'Duration in days',
+    description TEXT,
+    status ENUM('active', 'inactive', 'promotional') NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table for User Subscriptions
+CREATE TABLE IF NOT EXISTS subscriptions (
+    subscription_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    plan_id INT UNSIGNED NOT NULL,
+    start_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- No DEFAULT clause
+    status ENUM('active', 'expired', 'cancelled') NOT NULL DEFAULT 'active',
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Test data for users table
 INSERT INTO users (username, email, age, preferences, password, profile_picture, addr1, addr2, zip, state, country, first_name, last_name, subscription, role, banned, signup_date, last_login, total_messages_sent, total_cost_of_queries, tokens_sent, tokens_received) VALUES
@@ -168,6 +192,18 @@ INSERT INTO chat_history (user_id, personality_id, message, response, timestamp)
 (3, 3, 'Hey Eve, got any travel tips?', 'Sure! Have you ever visited the Grand Canyon?', CURRENT_TIMESTAMP),
 (4, 4, 'Adam, I need help with my computer.', 'Of course! What seems to be the issue?', CURRENT_TIMESTAMP),
 (5, 1, 'Good morning, John.', 'Good morning! What can I do for you today?', CURRENT_TIMESTAMP);
+
+INSERT INTO subscription_plans (name, price, duration, description, status) VALUES
+('Basic Plan', 9.99, 30, 'Basic subscription plan with limited features.', 'active'),
+('Premium Plan', 19.99, 30, 'Premium subscription plan with full features.', 'active'),
+('Annual Plan', 99.99, 365, 'One year subscription with a discount.', 'active'),
+('Promotional Plan', 5.99, 30, 'Limited time offer with reduced price.', 'promotional');
+
+INSERT INTO subscriptions (user_id, plan_id, start_date, end_date, status) VALUES
+(1, 1, '2023-11-01 00:00:00', '2023-12-01 00:00:00', 'active'),
+(2, 2, '2023-11-01 00:00:00', '2023-12-01 00:00:00', 'active'),
+(3, 3, '2023-01-01 00:00:00', '2024-01-01 00:00:00', 'expired'),
+(4, 4, '2023-11-01 00:00:00', '2023-12-01 00:00:00', 'cancelled');
 
 -- Role and Subscription Classification:
 -- Roles: 0 = New User, 1 = Moderator, 2 = Admin, 3 = Superadmin, 100 = Owner.

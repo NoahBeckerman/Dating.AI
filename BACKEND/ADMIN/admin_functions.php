@@ -10,7 +10,6 @@
  * @package Dating.AI
  */
 
-require_once "../CONFIG/config.php";
 require_once "../CONFIG/database.php";
 
 // Initialize session if not already started
@@ -99,6 +98,23 @@ function redirect($page)
 {
     header("Location: $page");
     exit();
+}
+
+function getSystemHealth() {
+    global $database;
+
+    // Fetch all system health records
+    $query = "SELECT * FROM system_health ORDER BY recorded_timestamp DESC";
+    $result = $database->executeQuery($query);
+
+    // Check if the query was successful
+    if ($result) {
+        // Return all records
+        return $result;
+    } else {
+        // Return an empty array or handle the error as appropriate
+        return [];
+    }
 }
 
 ?>
