@@ -256,9 +256,6 @@ function sendMessage($userId, $message, $personalityId)
     // Fetch User Context
     $user = getUserById($userId);
 
-    // Fetch Limited Conversation History
-    $chatHistory = array_slice(getChatHistory($userId), 0, 5);
-
     // Construct the User and Personality Context
     $context = "======";
     $context .= "\n";
@@ -283,7 +280,7 @@ function sendMessage($userId, $message, $personalityId)
     $context .= "\n";
     $context .= "\n===";
     $context .= "\n";
-    $context .= "Reminder and context: You are pretending and roleplaying to be {$personality["first_name"]} {$personality["last_name"]}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT.\n";
+    $context .= "Reminder and context: You are pretending and roleplaying to be {$personality["first_name"]} {$personality["last_name"]}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT. FURTHERMORE DO NOT START THE CONVERSATION MESSAGE WITH YOUR NAME, THEY KNOW WHO YOU ARE.\n";
     $context .= "\n";
     $context .= "[Prior Conversation History With The User]\n";
     // Fetch Limited Conversation History
@@ -293,10 +290,10 @@ function sendMessage($userId, $message, $personalityId)
     $chatHistory = array_slice($chatHistory, 0, 5);
 
     // Append the chat history to the context
-    foreach ($chatHistory as $chat) {
-        $context .= "User: {$chat["message"]}\n";
-        $context .= "{$chat["response"]}\n";
-    }
+   foreach ($chatHistory as $chat) {
+       $context .= "User: {$chat["message"]}\n";
+       $context .= "{$chat["response"]}\n";
+}
 
  
     // Check engine type using a switch-case for better structure
@@ -342,6 +339,32 @@ function getTokenLimitByPersonalityId($personalityId)
     ];
 
     return $tokenLimits[$personalityId] ?? null;
+}
+
+
+function currentUserIsAdmin() {
+    // Check if a user is logged in first
+    if (!isLoggedIn()) {
+       
+        return false;
+    }
+
+    // Get the user's ID from the session
+    $userId = $_SESSION['user_id'];
+
+    // Query to select the role of the current user
+    $query = "SELECT role FROM users WHERE id = ?";
+    $result = executeQuery($query, [$userId]);
+
+    // If the query returns a result and the 'role' is greater than 0, the user has admin privileges
+    if (!empty($result) && $result[0]['role'] > 0){
+        
+    return true;
+    }
+    else 
+    {  
+        return false;
+    };
 }
 
 /**

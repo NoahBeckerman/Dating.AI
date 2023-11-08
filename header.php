@@ -1,3 +1,4 @@
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <a class="navbar-brand" href="#">Dating.AI</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,9 +17,19 @@
       <li class="nav-item">
         <a class="nav-link" href="profile.php">Profile</a>
       </li>
+      <?php 
+      if (currentUserIsAdmin() == true) {
+        ?>
+        <li class="nav-item">
+        <a class="nav-link" href="./BACKEND/ADMIN/admin_dashboard.php">Admin Dashboard</a>
+      </li>
+      <?php
+      } 
+    ?>
       <li class="nav-item">
         <a class="nav-link" href="signout.php">Sign Out</a>
       </li> <?php endif; ?>
     </ul>
   </div>
 </nav>
+

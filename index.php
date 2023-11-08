@@ -1,6 +1,5 @@
 <?php
-require_once 'functions.php';
-
+require "functions.php";
 // Check if user is logged in, otherwise redirect to login page
 if (!isLoggedIn()) {
     redirect('login.php');
