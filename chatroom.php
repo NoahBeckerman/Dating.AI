@@ -174,7 +174,7 @@ $personalityDetails = getPersonalityById($personalityId);
             foreach ($chatMessages as $message) {
                 if ($message["user_id"] == $userId ) {
                     echo '<div class="chat-message user-message">You: ' . $message["message"] . '</div>';
-                    echo '<div class="chat-message recipient-message">' . $personalityDetails["first_name"] . ': ' . $message["response"] . '</div>';
+                    echo '<div class="chat-message recipient-message">' . $message["response"] . '</div>';
                 } 
             }
             ?>

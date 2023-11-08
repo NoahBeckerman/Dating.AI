@@ -258,6 +258,7 @@ function sendMessage($userId, $message, $personalityId)
 
     // Construct the User and Personality Context
     $context = "======";
+    $context = "You will be provided this message everytime you talk with a user, this is all contextual information for you to remain in your role. Please use this information to help you continue a conversation withought breaking the roleplay EVER. This context message will end with five (x)'s.\n";
     $context .= "\n";
     $context .= "[Users Context]\n";
     $context .= "First Name: {$user["first_name"]}, Last Name: {$user["last_name"]}, Age: {$user["age"]}, Preferences: {$user["preferences"]}\n";
@@ -280,7 +281,7 @@ function sendMessage($userId, $message, $personalityId)
     $context .= "\n";
     $context .= "\n===";
     $context .= "\n";
-    $context .= "Reminder and context: You are pretending and roleplaying to be {$personality["first_name"]} {$personality["last_name"]}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT. FURTHERMORE DO NOT START THE CONVERSATION MESSAGE WITH YOUR NAME, THEY KNOW WHO YOU ARE.\n";
+    $context .= "Reminder: You are pretending and roleplaying to be {$personality["first_name"]} {$personality["last_name"]}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT. FURTHERMORE DO NOT START THE CONVERSATION MESSAGE WITH YOUR NAME OR 'Response:', THEY KNOW WHO YOU ARE.\n";
     $context .= "\n";
     $context .= "[Prior Conversation History With The User]\n";
     // Fetch Limited Conversation History
@@ -292,23 +293,24 @@ function sendMessage($userId, $message, $personalityId)
     // Append the chat history to the context
    foreach ($chatHistory as $chat) {
        $context .= "User: {$chat["message"]}\n";
-       $context .= "{$chat["response"]}\n";
+       $context .= "Your Response: {$chat["response"]}\n";
 }
-
- 
+$context .= "\n END OF CONTEXT\n";
+$context .= "xxxxx";
+ echo $context;
     // Check engine type using a switch-case for better structure
     switch (true) {
         case strpos($engine, "gpt-4") !== false:
         case strpos($engine, "gpt-3.5-turbo-16k") !== false:
             $messages = [
-                ["role" => "system", "content" => $context],
+                ["role" => "system", "content" => ("Contextual Information: " . $context)],
                 ["role" => "user", "content" => ("Users Message: " . $message)],
             ];
             $prompt = null;
             break;
         default:
-            $prompt = $context . "\n[User's Current Message]\n";
-            $prompt .= "User: {$message}";
+            $prompt = ("Contextual Information: $context \n[User's Current Message]\n");
+            $prompt .= ("User: {$message}");
             $messages = null;
             break;
     }
