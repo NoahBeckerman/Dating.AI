@@ -251,7 +251,7 @@ function sendMessage($userId, $message, $personalityId)
 {
     // Fetch Personality Context
     $personality = getPersonalityById($personalityId);
-    $prePrompt = $personality["pre_prompt"];
+    $engine = $personality["engine"];
 
     // Fetch User Context
     $user = getUserById($userId);
@@ -298,8 +298,7 @@ function sendMessage($userId, $message, $personalityId)
         $context .= "{$chat["response"]}\n";
     }
 
-    //$engine = $prePrompt; // Assuming the engine name is the first line in pre_prompt
-    $engine = $prePrompt;
+ 
     // Check engine type using a switch-case for better structure
     switch (true) {
         case strpos($engine, "gpt-4") !== false:
@@ -346,14 +345,14 @@ function getTokenLimitByPersonalityId($personalityId)
 }
 
 /**
- * Get the pre_prompt for a specific personality ID.
+ * Get the engine for a specific personality ID.
  *
  * @param int $personalityId The personality ID.
- * @return string The pre_prompt for the personality.
+ * @return string The engine for the personality.
  */
-function getPromptByPersonalityId($personalityId)
+function getEngineByPersonalityId($personalityId)
 {
-    $query = "SELECT pre_prompt FROM personalities WHERE id = ?";
+    $query = "SELECT engine FROM personalities WHERE id = ?";
     $result = executeQuery($query, [$personalityId]);
     return $result[0] ?? null;
 }
