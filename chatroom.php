@@ -99,6 +99,9 @@ $personalityDetails = getPersonalityById($personalityId);
             clear: both;
             color: #adb5bd; /* Bootstrap dark text color */
         }
+        .chat-area{
+             scroll-behavior: smooth;
+        }
 
         .user-message {
             background-color: #495057; /* Bootstrap dark user message color */
@@ -151,7 +154,7 @@ $personalityDetails = getPersonalityById($personalityId);
 <body>
 <?php include "header.php"; ?>
 
-<main class="chatroom-container">
+<main class="chatroom-container" style="max-height: 1000px; overflow-y: auto;">
     <div class="chat-sidebar">
         <?php
         $previousChats = getPreviousChats($userId);
@@ -168,7 +171,7 @@ $personalityDetails = getPersonalityById($personalityId);
         <div class="chat-header">
             <h2><?php echo $personalityDetails["first_name"] . " " . $personalityDetails["last_name"]; ?></h2>
         </div>
-        <div class="chat-area">
+        <div class="chat-area" style="max-height: 500px; overflow-y: auto;">
             <?php
             $chatMessages = getChatMessages($userId, $personalityId);
             foreach ($chatMessages as $message) {
@@ -191,3 +194,18 @@ $personalityDetails = getPersonalityById($personalityId);
 <?php include "footer.php"; ?>
 </body>
 </html>
+<script>
+    // Function to scroll to the bottom of the chat area
+    function scrollToBottom() {
+        var chatArea = document.querySelector('.chat-area');
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Using MutationObserver to detect changes in the chat area
+    window.onload = function() {
+        var observer = new MutationObserver(scrollToBottom);
+        var config = { childList: true };
+        var target = document.querySelector('.chat-area');
+        observer.observe(target, config);
+    }
+</script>

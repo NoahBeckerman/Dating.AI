@@ -55,7 +55,7 @@ body {
     display: flex;
     flex-direction: row;
   }
-  
+
   .chat-sidebar {
     width: 30%;
     background-color: #1e1e1e;
