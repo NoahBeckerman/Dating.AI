@@ -1,187 +1,238 @@
 -- SQL File for DatingAI Database Structure
 
 -- Create database if it doesn't exist
+-- This statement ensures that a database named 'DatingAI' is created if it does not already exist.
+-- The character set and collation are set to utf8mb4 and utf8mb4_unicode_ci respectively for supporting a wide range of characters.
 CREATE DATABASE IF NOT EXISTS DatingAI CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Use the database
+-- This command switches to the 'DatingAI' database for subsequent operations.
 USE DatingAI;
 
 -- Create users table if it doesn't exist
+-- This table stores user information. Each user has a unique ID, username, email, and other personal details.
+-- 'AUTO_INCREMENT' is used for the 'id' to automatically increment this field for new records.
+-- 'PRIMARY KEY' is set on 'id' to uniquely identify each record.
 CREATE TABLE IF NOT EXISTS users (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    email VARCHAR(50) NOT NULL,
-    age INT,
-    preferences VARCHAR(255), 
-    password VARCHAR(255) NOT NULL,
-    profile_picture VARCHAR(255),
-    addr1 VARCHAR(255),
-    addr2 VARCHAR(255),
-    zip VARCHAR(10),
-    state VARCHAR(50),
-    country VARCHAR(50),
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    subscription INT,
-    role INT,
-    banned BOOLEAN,
-    signup_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    total_messages_sent INT,
-    total_cost_of_queries FLOAT,
-    tokens_sent INT DEFAULT 0,
-    tokens_received INT DEFAULT 0
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each user
+    username VARCHAR(50) NOT NULL,  -- Username chosen by the user
+    email VARCHAR(50) NOT NULL,  -- User's email address
+    age INT,  -- User's age
+    preferences VARCHAR(255),  -- User's preferences, possibly in JSON format
+    password VARCHAR(255) NOT NULL,  -- Hashed password for user authentication
+    profile_picture VARCHAR(255),  -- URL or path to the user's profile picture
+    addr1 VARCHAR(255),  -- Address line 1 for the user
+    addr2 VARCHAR(255),  -- Address line 2 for the user
+    zip VARCHAR(10),  -- ZIP/postal code for the user's address
+    state VARCHAR(50),  -- State or region for the user's address
+    country VARCHAR(50),  -- Country for the user's address
+    first_name VARCHAR(50),  -- User's first name
+    last_name VARCHAR(50),  -- User's last name
+    subscription INT,  -- Subscription type or level for the user
+    role INT,  -- Role identifier, useful for role-based access control
+    banned BOOLEAN,  -- Flag to indicate if the user is banned
+    signup_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of user signup
+    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- Timestamp of the user's last login
+    total_messages_sent INT,  -- Total number of messages sent by the user
+    total_cost_of_queries FLOAT,  -- Total cost incurred by the user for queries
+    tokens_sent INT DEFAULT 0,  -- Number of tokens sent by the user
+    tokens_received INT DEFAULT 0  -- Number of tokens received by the user
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create personalities table if it doesn't exist
+-- This table stores information about different personalities available in the app.
+-- It includes personal details and characteristics of each personality.
+CREATE TABLE IF NOT EXISTS personalities (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each personality
+    name VARCHAR(50),  -- Name of the personality
+    description TEXT,  -- Description of the personality
+    traits JSON  -- JSON field containing various traits of the personality
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create characters table if it doesn't exist
-
--- characters table stores the static attributes of each AI character
+-- This table stores detailed information about each character created in the app.
 CREATE TABLE IF NOT EXISTS characters (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(50),  -- Character's first name
-    last_name VARCHAR(50),   -- Character's last name
-    profile_picture VARCHAR(255),  -- URL to character's profile picture
-    current_location VARCHAR(100), -- Character's current location
-    sex VARCHAR(50),  -- Character's gender
-    age INT,  -- Character's age
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each character
+    first_name VARCHAR(50),  -- First name of the character
+    last_name VARCHAR(50),  -- Last name of the character
+    profile_picture VARCHAR(255),  -- URL or path to the character's profile picture
+    current_location VARCHAR(100),  -- Current location of the character
+    sex VARCHAR(50),  -- Gender of the character
+    age INT,  -- Age or age appearance of the character
     bio TEXT,  -- Short biography or description of the character
-    interests JSON,  -- List of character's interests and hobbies
-    dislikes JSON,  -- List of character's dislikes
-    personality_traits JSON,  -- Character's personality traits
-    physical_characteristics JSON,  -- Character's physical characteristics
-    voice_tone VARCHAR(255),  -- Description of character's voice tone
-    style_of_interaction VARCHAR(255),  -- Character's general interaction style
-    ai_model_type VARCHAR(255),  -- Type/version of AI model used
-    customization_options JSON,  -- Additional customizable features
-    status VARCHAR(50),  -- Character's current status (active, inactive, etc.)
-    availability_schedule JSON,  -- Character's availability hours/conditions
-    creator_user_id INT UNSIGNED,  -- ID of user who created/interacts with character
+    interests JSON,  -- JSON field containing a list of interests and hobbies
+    dislikes JSON,  -- JSON field containing a list of dislikes
+    personality_traits JSON,  -- JSON field containing specific personality traits
+    physical_characteristics JSON,  -- JSON field for physical characteristics like height, build, hair color, etc.
+    voice_tone VARCHAR(255),  -- Description or reference to the character's voice style
+    style_of_interaction VARCHAR(255),  -- General style of interaction (e.g., formal, casual)
+    ai_model_type VARCHAR(255),  -- Type or version of the AI model used for the character
+    customization_options JSON,  -- JSON field for additional customizable features
+    status VARCHAR(50),  -- Status of the character (e.g., active, inactive)
+    availability_schedule JSON,  -- JSON field for available hours or conditions
+    creator_user_id INT UNSIGNED,  -- ID of the user who created or primarily interacts with the character
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of character creation
-    last_modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- Timestamp of last update
-    language_preferences JSON,  -- Preferred languages for interaction
-    cultural_references TEXT,  -- Specific cultural nuances or references
-    emotional_intelligence_level INT,  -- AI's ability to handle emotional contexts
-    FOREIGN KEY (creator_user_id) REFERENCES users(id)  -- Link to users table
+    last_modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- Timestamp of the last update to the character
+    language_preferences JSON,  -- JSON field for preferred languages for interaction
+    cultural_references TEXT,  -- Field for specific cultural nuances or references
+    emotional_intelligence_level INT,  -- Metric to measure the AI's ability to handle emotional contexts
+    FOREIGN KEY (creator_user_id) REFERENCES users(id)  -- Linking character to a specific user
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- interaction_history table records each interaction between users and characters
+-- Create interaction_history table if it doesn't exist
+-- This table stores the history of interactions between users and characters.
 CREATE TABLE IF NOT EXISTS interaction_history (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each interaction record
     character_id INT UNSIGNED,  -- ID of the character involved in the interaction
     user_id INT UNSIGNED,  -- ID of the user involved in the interaction
-    interaction_details TEXT,  -- Details of the interaction
-    interaction_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the interaction
-    FOREIGN KEY (character_id) REFERENCES characters(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)  -- Link to users table
+    interaction_details TEXT,  -- Detailed description or log of the interaction
+    interaction_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of when the interaction occurred
+    FOREIGN KEY (character_id) REFERENCES characters(id),  -- Linking to the characters table
+    FOREIGN KEY (user_id) REFERENCES users(id)  -- Linking to the users table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- learning_outcomes table tracks what AI has learned about each user
+-- Create learning_outcomes table if it doesn't exist
+-- This table tracks the learning outcomes and relationship levels between users and characters.
 CREATE TABLE IF NOT EXISTS learning_outcomes (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED,  -- ID of the user
-    character_id INT UNSIGNED,  -- ID of the character
-    learned_data JSON,  -- Data learned about the user
-    relationship_level INT,  -- Metric for user-character bond
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of last update
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (character_id) REFERENCES characters(id)  -- Link to characters table
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each learning outcome record
+    user_id INT UNSIGNED,  -- ID of the user associated with the learning outcome
+    character_id INT UNSIGNED,  -- ID of the character associated with the learning outcome
+    learned_data JSON,  -- JSON field containing data learned about the user
+    relationship_level INT,  -- Metric to gauge the user-character bond
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the last update to the learning outcome
+    FOREIGN KEY (user_id) REFERENCES users(id),  -- Linking to the users table
+    FOREIGN KEY (character_id) REFERENCES characters(id)  -- Linking to the characters table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- Create chat history table if it doesn't exist
 CREATE TABLE IF NOT EXISTS chat_history (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED,
-    personality_id INT UNSIGNED,
-    message TEXT NOT NULL,
-    response TEXT NOT NULL,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (personality_id) REFERENCES personalities(id)
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each chat entry
+    user_id INT UNSIGNED,  -- ID of the user involved in the chat
+    personality_id INT UNSIGNED,  -- ID of the personality involved in the chat
+    message TEXT NOT NULL,  -- The message sent by the user
+    response TEXT NOT NULL,  -- The response from the personality
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the chat
+    FOREIGN KEY (user_id) REFERENCES users(id),  -- Foreign key to users table
+    FOREIGN KEY (personality_id) REFERENCES personalities(id)  -- Foreign key to personalities table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Create UserDeletedConversation table if it doesn't exist
 CREATE TABLE IF NOT EXISTS UserDeletedConversation (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED,
-    personality_id INT UNSIGNED,
-    message TEXT NOT NULL,
-    response TEXT NOT NULL,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (personality_id) REFERENCES personalities(id)
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each deleted conversation entry
+    user_id INT UNSIGNED,  -- ID of the user involved in the deleted conversation
+    personality_id INT UNSIGNED,  -- ID of the personality involved in the deleted conversation
+    message TEXT NOT NULL,  -- The message that was deleted
+    response TEXT NOT NULL,  -- The response that was deleted
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the deletion
+    FOREIGN KEY (user_id) REFERENCES users(id),  -- Foreign key to users table
+    FOREIGN KEY (personality_id) REFERENCES personalities(id)  -- Foreign key to personalities table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 
 -- Create model_usage table if it doesn't exist
 CREATE TABLE IF NOT EXISTS model_usage (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL,
-    model_name VARCHAR(255) NOT NULL,
-    usage_count INT DEFAULT 0,
-    last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    tokens_sent INT DEFAULT 0,
-    tokens_received INT DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each model usage entry
+    user_id INT UNSIGNED NOT NULL,  -- ID of the user using the model
+    model_name VARCHAR(255) NOT NULL,  -- Name of the AI model used
+    usage_count INT DEFAULT 0,  -- Count of how many times the model has been used
+    last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Last time the model was used
+    tokens_sent INT DEFAULT 0,  -- Tokens sent by the user for using the model
+    tokens_received INT DEFAULT 0,  -- Tokens received by the user for using the model
+    FOREIGN KEY (user_id) REFERENCES users(id)  -- Foreign key to users table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Create billing_records table if it doesn't exist
 CREATE TABLE IF NOT EXISTS billing_records (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL,
-    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    amount DECIMAL(10,2) NOT NULL,
-    transaction_type VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    item_description TEXT,
-    item_quantity INT DEFAULT 1,
-    item_price DECIMAL(10,2) NOT NULL,
-    item_total DECIMAL(10,2) AS (item_quantity * item_price),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each billing record
+    user_id INT UNSIGNED NOT NULL,  -- ID of the user associated with the billing record
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Date of the transaction
+    amount DECIMAL(10,2) NOT NULL,  -- Amount of the transaction
+    transaction_type VARCHAR(50) NOT NULL,  -- Type of transaction (e.g., subscription renewal, token purchase)
+    status VARCHAR(50) NOT NULL,  -- Status of the transaction (e.g., completed, pending)
+    item_description TEXT,  -- Description of the item purchased
+    item_quantity INT DEFAULT 1,  -- Quantity of the item purchased
+    item_price DECIMAL(10,2) NOT NULL,  -- Price per item
+    item_total DECIMAL(10,2) AS (item_quantity * item_price),  -- Total cost of the item(s)
+    FOREIGN KEY (user_id) REFERENCES users(id)  -- Foreign key to users table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create system_health table if it doesn't exist
 CREATE TABLE IF NOT EXISTS system_health (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    metric_name VARCHAR(255) NOT NULL,
-    metric_value VARCHAR(255) NOT NULL,
-    recorded_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each system health record
+    metric_name VARCHAR(255) NOT NULL,  -- Name of the metric being recorded
+    metric_value VARCHAR(255) NOT NULL,  -- Value of the metric
+    recorded_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Timestamp when the metric was recorded
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- Create user_activity table if it doesn't exist
 CREATE TABLE IF NOT EXISTS user_activity (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL,
-    action_type VARCHAR(50) NOT NULL,
-    action_description TEXT,
-    action_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each user activity record
+    user_id INT UNSIGNED NOT NULL,  -- ID of the user whose activity is being recorded
+    activity_type VARCHAR(255) NOT NULL,  -- Type of activity (e.g., login, message sent)
+    activity_description TEXT,  -- Detailed description of the activity
+    activity_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp when the activity occurred
+    FOREIGN KEY (user_id) REFERENCES users(id)  -- Foreign key to users table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table for Subscription Plans
+-- Create user_tokens table if it doesn't exist
+CREATE TABLE IF NOT EXISTS user_tokens (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each user token record
+    user_id INT UNSIGNED NOT NULL,  -- ID of the user owning the tokens
+    token_count INT DEFAULT 0,  -- Number of tokens the user has
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Last time the token count was updated
+    FOREIGN KEY (user_id) REFERENCES users(id)  -- Foreign key to users table
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create user_reports table if it doesn't exist
+CREATE TABLE IF NOT EXISTS user_reports (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each user report
+    reported_user_id INT UNSIGNED NOT NULL,  -- ID of the user being reported
+    reporting_user_id INT UNSIGNED NOT NULL,  -- ID of the user making the report
+    report_reason TEXT NOT NULL,  -- Reason for the report
+    report_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp when the report was made
+    FOREIGN KEY (reported_user_id) REFERENCES users(id),  -- Foreign key to users table (reported user)
+    FOREIGN KEY (reporting_user_id) REFERENCES users(id)  -- Foreign key to users table (reporting user)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create user_preferences table if it doesn't exist
+CREATE TABLE IF NOT EXISTS user_preferences (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each user preference record
+    user_id INT UNSIGNED NOT NULL,  -- ID of the user whose preferences are being recorded
+    preference_name VARCHAR(255) NOT NULL,  -- Name of the preference
+    preference_value VARCHAR(255) NOT NULL,  -- Value of the preference
+    FOREIGN KEY (user_id) REFERENCES users(id)  -- Foreign key to users table
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Create subscription_plans table if it doesn't exist
 CREATE TABLE IF NOT EXISTS subscription_plans (
-    plan_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL COMMENT 'Price of the plan',
-    duration INT UNSIGNED NOT NULL COMMENT 'Duration in days',
-    description TEXT,
-    status ENUM('active', 'inactive', 'promotional') NOT NULL DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    plan_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each subscription plan
+    name VARCHAR(255) NOT NULL,  -- Name of the subscription plan
+    price DECIMAL(10, 2) NOT NULL COMMENT 'Price of the plan',  -- Price of the subscription plan
+    duration INT UNSIGNED NOT NULL COMMENT 'Duration in days',  -- Duration of the plan in days
+    description TEXT,  -- Description of the subscription plan
+    status ENUM('active', 'inactive', 'promotional') NOT NULL DEFAULT 'active',  -- Status of the plan (active, inactive, promotional)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp when the plan was created
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  -- Timestamp when the plan was last updated
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table for User Subscriptions
+-- Create subscriptions table if it doesn't exist
 CREATE TABLE IF NOT EXISTS subscriptions (
-    subscription_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL,
-    plan_id INT UNSIGNED NOT NULL,
-    start_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- No DEFAULT clause
-    status ENUM('active', 'expired', 'cancelled') NOT NULL DEFAULT 'active',
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
+    subscription_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each user subscription
+    user_id INT UNSIGNED NOT NULL,  -- ID of the user who has the subscription
+    plan_id INT UNSIGNED NOT NULL,  -- ID of the subscription plan
+    start_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- Start date of the subscription
+    end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- End date of the subscription (no default value set)
+    status ENUM('active', 'expired', 'cancelled') NOT NULL DEFAULT 'active',  -- Status of the subscription (active, expired, cancelled)
+    FOREIGN KEY (user_id) REFERENCES users(id),  -- Foreign key to users table
+    FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)  -- Foreign key to subscription_plans table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 
