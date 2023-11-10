@@ -4,6 +4,8 @@ require "functions.php";
 if (!isLoggedIn()) {
     redirect('login.php');
 }
+
+//resetUserPassword(0, "");
 // Display the index page content
 ?>
 <!DOCTYPE html>
