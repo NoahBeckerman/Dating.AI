@@ -33,20 +33,61 @@ CREATE TABLE IF NOT EXISTS users (
     tokens_received INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create personalities table if it doesn't exist
-CREATE TABLE IF NOT EXISTS personalities (
+-- Create characters table if it doesn't exist
+
+-- characters table stores the static attributes of each AI character
+CREATE TABLE IF NOT EXISTS characters (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    profile_picture VARCHAR(255),
-    description TEXT,
-    notes TEXT,
-    likes TEXT,
-    dislikes TEXT,
-    sex VARCHAR(10),
-    location VARCHAR(50),
-    engine TEXT
+    first_name VARCHAR(50),  -- Character's first name
+    last_name VARCHAR(50),   -- Character's last name
+    profile_picture VARCHAR(255),  -- URL to character's profile picture
+    current_location VARCHAR(100), -- Character's current location
+    sex VARCHAR(50),  -- Character's gender
+    age INT,  -- Character's age
+    bio TEXT,  -- Short biography or description of the character
+    interests JSON,  -- List of character's interests and hobbies
+    dislikes JSON,  -- List of character's dislikes
+    personality_traits JSON,  -- Character's personality traits
+    physical_characteristics JSON,  -- Character's physical characteristics
+    voice_tone VARCHAR(255),  -- Description of character's voice tone
+    style_of_interaction VARCHAR(255),  -- Character's general interaction style
+    ai_model_type VARCHAR(255),  -- Type/version of AI model used
+    customization_options JSON,  -- Additional customizable features
+    status VARCHAR(50),  -- Character's current status (active, inactive, etc.)
+    availability_schedule JSON,  -- Character's availability hours/conditions
+    creator_user_id INT UNSIGNED,  -- ID of user who created/interacts with character
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of character creation
+    last_modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- Timestamp of last update
+    language_preferences JSON,  -- Preferred languages for interaction
+    cultural_references TEXT,  -- Specific cultural nuances or references
+    emotional_intelligence_level INT,  -- AI's ability to handle emotional contexts
+    FOREIGN KEY (creator_user_id) REFERENCES users(id)  -- Link to users table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- interaction_history table records each interaction between users and characters
+CREATE TABLE IF NOT EXISTS interaction_history (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    character_id INT UNSIGNED,  -- ID of the character involved in the interaction
+    user_id INT UNSIGNED,  -- ID of the user involved in the interaction
+    interaction_details TEXT,  -- Details of the interaction
+    interaction_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the interaction
+    FOREIGN KEY (character_id) REFERENCES characters(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)  -- Link to users table
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- learning_outcomes table tracks what AI has learned about each user
+CREATE TABLE IF NOT EXISTS learning_outcomes (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED,  -- ID of the user
+    character_id INT UNSIGNED,  -- ID of the character
+    learned_data JSON,  -- Data learned about the user
+    relationship_level INT,  -- Metric for user-character bond
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of last update
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (character_id) REFERENCES characters(id)  -- Link to characters table
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Create chat history table if it doesn't exist
 CREATE TABLE IF NOT EXISTS chat_history (
@@ -142,6 +183,8 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+
 -- Test data for users table
 INSERT INTO users (username, email, age, preferences, password, profile_picture, addr1, addr2, zip, state, country, first_name, last_name, subscription, role, banned, signup_date, last_login, total_messages_sent, total_cost_of_queries, tokens_sent, tokens_received) VALUES
 ('JohnDoe', 'john.doe@example.com', NULL, NULL, 'password123', NULL, '123 Main St', 'Apt 4', '12345', 'NY', 'USA', 'John', 'Doe', 1, 0, FALSE, '2023-10-22 07:29:33', '2023-10-22 07:29:33', 10, 5.00, 100, 50),
@@ -178,12 +221,24 @@ INSERT INTO user_activity (user_id, action_type, action_description) VALUES
 (4, 'Subscription', 'User upgraded to Tier Three Subscription'),
 (5, 'Login', 'User logged in from IP: 172.16.254.1');
 
--- Test data for personalities table
-INSERT INTO personalities (first_name, last_name, profile_picture, description, notes, likes, dislikes, sex, location, engine) VALUES
-('John', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'Friendly and outgoing.', 'Loves to chat.', 'Coffee, Books', 'Loud noises', 'male', 'New York', 'gpt-3.5-turbo-16k'),
-('Jane', 'Doe', 'AI-CHARACTERS\\2\\front-view-smiling-woman.jpg', 'Introverted but thoughtful.', 'Enjoys solitude.', 'Reading, Music', 'Crowds', 'female', 'San Francisco', 'gpt-3.5-turbo-16k'),
-('Eve', 'Adams', 'AI-CHARACTERS\\3\\eve_adams.jpg', 'Adventurous and creative.', 'Seeks new experiences.', 'Travel, Photography', 'Routine', 'female', 'Austin', 'gpt-3.5-turbo-16k'),
-('Adam', 'Johnson', 'AI-CHARACTERS\\4\\adam_johnson.jpg', 'Analytical and curious.', 'Problem solver.', 'Puzzles, Technology', 'Inefficiency', 'male', 'Seattle', 'gpt-3.5-turbo-16k');
+-- Example test data for characters table
+INSERT INTO characters (first_name, last_name, profile_picture, current_location, sex, age, bio, interests, dislikes, personality_traits, physical_characteristics, voice_tone, style_of_interaction, ai_model_type, customization_options, status, availability_schedule, creator_user_id, language_preferences, cultural_references, emotional_intelligence_level)
+VALUES ('Alex', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'New York', 'Male', 30, 'Friendly and knowledgeable AI companion', JSON_ARRAY('reading', 'coding'), JSON_ARRAY('loud noises'), JSON_OBJECT('kind', 'true', 'intelligent', 'true'), JSON_OBJECT('height', '6ft', 'hair_color', 'brown'), 'Calm and soothing', 'Casual', 'gpt-4-1106-preview', JSON_OBJECT('hair_style', 'short', 'eye_color', 'blue'), 'active', JSON_OBJECT('weekdays', '9am-5pm'), 1, JSON_ARRAY('English', 'Spanish'), 'Enjoys American and Spanish culture', 5);
+
+-- Example test data for interaction_history table
+INSERT INTO interaction_history (character_id, user_id, interaction_details)
+VALUES (1, 1, 'Discussed latest technology trends');
+
+-- Example test data for learning_outcomes table
+INSERT INTO learning_outcomes (user_id, character_id, learned_data, relationship_level)
+VALUES (1, 1, JSON_OBJECT('favorite_topics', JSON_ARRAY('AI', 'Machine Learning')), 3);
+
+-- Test data for personalities table OLD TABLE FOR CHARACTERS TABLE. 
+-- INSERT INTO personalities (first_name, last_name, profile_picture, description, notes, likes, dislikes, sex, location, engine) VALUES
+-- ('John', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'Friendly and outgoing.', 'Loves to chat.', 'Coffee, Books', 'Loud noises', 'male', 'New York', 'gpt-3.5-turbo-16k'),
+-- ('Jane', 'Doe', 'AI-CHARACTERS\\2\\front-view-smiling-woman.jpg', 'Introverted but thoughtful.', 'Enjoys solitude.', 'Reading, Music', 'Crowds', 'female', 'San Francisco', 'gpt-3.5-turbo-16k'),
+-- ('Eve', 'Adams', 'AI-CHARACTERS\\3\\eve_adams.jpg', 'Adventurous and creative.', 'Seeks new experiences.', 'Travel, Photography', 'Routine', 'female', 'Austin', 'gpt-3.5-turbo-16k'),
+-- ('Adam', 'Johnson', 'AI-CHARACTERS\\4\\adam_johnson.jpg', 'Analytical and curious.', 'Problem solver.', 'Puzzles, Technology', 'Inefficiency', 'male', 'Seattle', 'gpt-3.5-turbo-16k');
 
 -- Test data for chat_history table
 INSERT INTO chat_history (user_id, personality_id, message, response, timestamp) VALUES
