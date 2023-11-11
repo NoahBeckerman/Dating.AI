@@ -258,7 +258,7 @@ INSERT INTO user_activity (user_id, activity_type, activity_description, activit
 
 -- Example test data for characters table
 INSERT INTO characters (first_name, last_name, profile_picture, current_location, sex, age, bio, interests, dislikes, personality_traits, physical_characteristics, voice_tone, style_of_interaction, ai_model_type, customization_options, status, availability_schedule, creator_user_id, language_preferences, cultural_references, emotional_intelligence_level)
-VALUES ('Alex', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'New York', 'Male', 30, 'Friendly and knowledgeable AI companion', '["reading", "coding"]', '["loud noises"]', '{"kind": "true", "intelligent": "true"}', '{"height": "6ft", "hair_color": "brown"}', 'Calm and soothing', 'Casual', 'gpt-4-1106-preview', '{"hair_style": "short", "eye_color": "blue"}', 'active', '{"weekdays": "9am-5pm"}', 1, '["English", "Spanish"]', 'Enjoys American and Spanish culture', 5);
+VALUES ('Alex', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'New York', 'Male', 30, 'Friendly and knowledgeable AI companion', '{\"Reading\": \"Level 1\", \"Coding\": \"Level 3\", \"Teaching\": \"Level 2\"}', '{\"Loud noises\": \"Level 1\", \"Bad smells\": \"Level 3\", \"Long Lines\": \"Level 2\"}', '{"kind": "true", "intelligent": "true"}', '{"height": "6ft", "hair_color": "brown"}', 'Calm and soothing', 'Casual', 'gpt-4-1106-preview', '{"hair_style": "short", "eye_color": "blue"}', 'active', '{"weekdays": "9am-5pm"}', 1, '{\"English\": \"Level 3\", \"Spanish\": \"Level 2\", \"Polish\": \"Level 1\"}', 'Enjoys American and Spanish culture', 5);
 
 -- Example test data for interaction_history table
 INSERT INTO interaction_history (characters_id, user_id, interaction_details)

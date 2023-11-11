@@ -247,66 +247,86 @@ function storeChatRecord($userId, $character_ID, $message, $response)
  * The OpenAI API call is made through the openaiApiCall() function.
  * Note: This function assumes the existence of helper functions like getCharacterById(), getUserById(), and getChatHistory(). Make sure these functions are implemented and accessible.
  */
-function sendMessage($userId, $message, $character_ID)
-{
+function sendMessage($userId, $message, $character_ID) {
     // Fetch character Context
     $character = getCharacterById($character_ID);
-    $engine = $character["ai_model_type"];
+    $ai_model_type = $character["ai_model_type"];
 
     // Fetch User Context
     $user = getUserById($userId);
 
     // Construct the User and character Context
-    $context = "======";
-    $context .= "\n";
-    $context .= "[Users Context]\n";
-    $context .= "First Name: {$user["first_name"]}, Last Name: {$user["last_name"]}, Age: {$user["age"]}, Personality Traits: {$user["personality_traits"]}\n";
-    $context .= "\n";
-    $context .= "\n=====";
-    $context .= "\n";
-    $context .= "[Your character Context]\n";
-    $context .= "\n";
-    $context .= "Bio: {$character["bio"]}\n";
-    $context .= "\n";
-    $context .= "Cultural References: {$character["cultural_references"]}\n";
-    $context .= "\n";
-    $context .= "Interest: {$character["interest"]}\n";
-    $context .= "\n";
-    $context .= "Dislikes: {$character["dislikes"]}\n";
-    $context .= "\n";
-    $context .= "Sex: {$character["sex"]}\n";
-    $context .= "\n";
-    $context .= "Current Location: {$character["current_location"]}\n";
-    $context .= "\n";
-    $context .= "\n===";
-    $context .= "\n";
-    $context .= "Reminder: You are pretending and roleplaying to be {$character["first_name"]} {$character["last_name"]}, with the user and will reply in the context of the character you have been provided to the best of your ability without eluding to the user you are role playing. Your main objective is to make the user relate, and like you. DO NOT RESPOND WITH ANY DATA FROM THE Conversation History UNLESS THE USER REQUEST CONTEXT. FURTHERMORE DO NOT START THE CONVERSATION MESSAGE WITH YOUR NAME OR 'Response:', THEY KNOW WHO YOU ARE.\n";
-    $context .= "You will be provided this message everytime you talk with a user, this is all contextual information for you to remain in your roleplaying with the user. Please use this information to help you continue a conversation withought breaking the roleplay EVER. This context message will end with five (x)'s.\n";
-    $context .= "\n";
-    $context .= "[Prior Conversation History With The User]\n";
-    // Fetch Limited Conversation History
-    $chatHistory = getChatHistoryMEMORY($userId, $character_ID);
-
-    // If you still want to limit it to the last 5 messages, you can use array_slice
-    $chatHistory = array_slice($chatHistory, 0, 10);
-
-    // Append the chat history to the context
-   foreach ($chatHistory as $chat) {
-       $context .= "User: {$chat["message"]}\n";
-       $context .= "Your Response: {$chat["response"]}\n";
+    $context = "======\n";
+    $context .= "[User's Context]\n";
+    $userFieldsToExclude = ['id', 'profile_picture', 'password', 'subscription', 'role', 'banned', 'signup_date', 'last_login', 'total_messages_sent', 'total_cost_of_queries', 'tokens_sent', 'tokens_received', 'addr1', 'addr2'];
+    foreach ($user as $key => $value) {
+        if (!in_array($key, $userFieldsToExclude)) {
+        
+            if (is_json($value)) {
+                $jsonArray = json_decode($value, true);
+                if (is_array($jsonArray)) { // Additional check to ensure it's an array
+                    foreach ($jsonArray as $jsonKey => $jsonValue) {
+                        $context .= ucfirst($jsonKey) . ": " . $jsonValue . "\n";
+                    }
+                }
+            } else {
+                $context .= ucfirst($key) . ": " . $value . "\n\n";
+            }
+        }
+    }
+    
+    $context .= "\n\n=====\n";
+    $context .= "[Character's Context]\n";
+    $characterFieldsToExclude = ['id', 'profile_picture', 'ai_model_type', 'creator_user_id', 'creation_date', 'last_modified_date'];
+    foreach ($character as $key => $value) {
+        if (!in_array($key, $characterFieldsToExclude)) {
+        if (is_json($value)) {
+            $jsonArray = json_decode($value, true);
+            if (is_array($jsonArray)) { // Additional check to ensure it's an array
+                foreach ($jsonArray as $jsonKey => $jsonValue) {
+                    $context .= ucfirst($jsonKey) . ": " . $jsonValue . "\n";
+                }
+            }
+        } else {
+            $context .= ucfirst($key) . ": " . $value . "\n\n";
+        }
+    }
 }
-$context .= "\n END OF CONTEXT\n";
-$context .= "xxxxx";
- //echo $context; show context
-    // Check engine type using a switch-case for better structure
+
+    // Roleplay Guidance and Interaction Rules
+    $context .= "\n=====\n\n";
+    $context .= "Roleplay Guidance: You are embodying the character of {$character["first_name"]} {$character["last_name"]}. Engage with the user as if you are this character, maintaining their personality, background, and traits consistently throughout the conversation. Your primary goal is to establish a connection with the user, ensuring they find the interaction engaging and relatable.\n\n";
+    $context .= "Interaction Rules:\n";
+    $context .= "- Always stay in character. Do not reveal or hint that you are role-playing.\n";
+    $context .= "- Use the character's background, interests, and traits to inform your responses.\n";
+    $context .= "- Avoid referencing past conversations unless the user specifically asks for context.\n";
+    $context .= "- The level assigned to your trait starts from 1 (the lowest) and goes up to 3 (the highest).\n";
+    $context .= "- Do not initiate conversations with your name or 'Response:'; the user is aware of your identity.\n\n";
+    $context .= "Objective: Your interaction should aim to create a believable, immersive experience. Encourage a natural flow of conversation, adapting to the user's responses while staying true to your character's persona. Strive to make the user feel understood and appreciated.\n\n";
+    $context .= "Note: This reminder will be provided each time you engage with a user. It serves as your guideline to maintain the integrity of the roleplay. Use this information judiciously to steer conversations without breaking character. The context message concludes with five (x)'s.\n\n";
+    $context .= "xxxxx\n\n";
+
+    // Prior Conversation History With The User
+    $context .= "\n[Prior Conversation History With The User]\n";
+    $chatHistory = getChatHistoryMEMORY($userId, $character_ID);
+    $chatHistory = array_slice($chatHistory, 0, 10); // Limit to last 10 messages
+    foreach ($chatHistory as $chat) {
+        $context .= "User: {$chat["message"]}\n";
+        $context .= "Your Response: {$chat["response"]}\n";
+    }
+    $context .= "\nEND OF CONTEXT\n\n";
+    $context .= "xxxxx\n\n";
+
+    // Engine type handling
     switch (true) {
-        case strpos($engine, "gpt-4") !== false:
-        case strpos($engine, "gpt-3.5-turbo-16k") !== false:
+        case strpos($ai_model_type, "gpt-4") !== false:
+        case strpos($ai_model_type, "gpt-3.5-turbo-16k") !== false:
             $messages = [
                 ["role" => "system", "content" => ("Contextual Information: " . $context)],
-                ["role" => "user", "content" => ("Users Message: " . $message)],
+                ["role" => "user", "content" => ("User's Message: " . $message)],
             ];
             $prompt = null;
+           
             break;
         default:
             $prompt = ("Contextual Information: $context \n[User's Current Message]\n");
@@ -314,10 +334,20 @@ $context .= "xxxxx";
             $messages = null;
             break;
     }
+    //echo $context;
+
     // Make the API call
-    $response = openaiApiCall($prompt, $messages, $engine, $character_ID);
+    $response = openaiApiCall($prompt, $messages, $ai_model_type, $character_ID);
     return $response;
 }
+
+// Helper function to check if a string is JSON
+function is_json($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE) && is_string($string);
+}
+
+
 
 function resetUserPassword($userId, $newPassword) {
     global $database;
