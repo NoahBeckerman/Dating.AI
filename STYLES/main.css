@@ -290,13 +290,13 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
 .btn-login:hover {
   background-color: var(--button-bg-hover);
 }
-
 /* Chatroom Styles */
 .chatroom-container {
   display: flex;
-  height: calc(100vh - 54px - 66px); /* Adjust for header/footer height */
+  height: calc(100vh - 56x - 66px); /* Adjust for header/footer height */
   background-color: var(--background-color);
   overflow: hidden;
+  margin-top: 0; 
 }
 
 .chat-sidebar {
@@ -304,6 +304,39 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   background-color: var(--navbar-bg);
   color: var(--navbar-text);
   overflow-y: auto;
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+  padding: 0; /* Remove padding */
+  box-sizing: border-box; /* Include padding and border in the width */
+}
+
+.chat-sidebar > :first-child {
+  margin-top: 0; /* Remove top margin of the first child */
+}
+
+
+.chat-sidebar .profile-picture {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.chat-sidebar .contact {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.chat-sidebar .contact-name {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.chat-sidebar .message-snippet {
+  color: #666;
+  font-size: 0.9em;
 }
 
 .chat-content {
@@ -315,19 +348,22 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
 
 .chat-header {
   padding: 10px;
-  background-color: var(--header-footer-bg);
+  background-color: var(--secondary-color); /* Use the secondary color */
   border-bottom: 1px solid var(--input-border);
+ 
+  
 }
 
 .chat-area {
   flex-grow: 1;
-  overflow-x: hidden; /* Hide horizontal scrollbar */
+  overflow-y: auto; /* Enable vertical scrollbar */
   padding: 10px;
 }
 
 .chat-message-container {
   display: flex;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .user-message-container {
@@ -339,23 +375,19 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
 }
 
 .chat-message {
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: var(--modal-bg);
-  border: 1px solid var(--input-border);
-  max-width: 50%; /* Limit width to half of the chat window */
+  border-radius: 7.5px;
+  padding: 5px 10px;
+  max-width: 60%;
+  word-wrap: break-word; /* Ensure long texts are wrapped */
 }
 
 .user-message {
-  background-color: var(--button-bg);
-  color: white;
-  text-align: right;
+  background-color: #DCF8C6;
+  align-self: flex-end;
 }
 
 .recipient-message {
-  background-color: var(--modal-bg);
-  text-align: left;
+  background-color: #fff;
 }
 
 .message-input-area {
@@ -363,6 +395,7 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   background: var(--header-footer-bg);
   border-top: 1px solid var(--input-border);
 }
+
 
 .characters-container {
   display: flex;
@@ -489,41 +522,47 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   color: white;
 }
 
+
+
+
 /* Profile Card Styles */
 .profile-card {
   display: flex;
   align-items: center;
   padding: 10px;
-  margin-bottom: 10px;
-  background-color: var(--background-color);
-  border-radius: 0px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  border-bottom: 1px solid #ddd; /* Light grey border at the bottom */
+  width: 100%; /* Stretch to full width */
+  background-color: var(--secondary-color);
 }
 
+/* Optional: Add hover effect to mimic WhatsApp's interaction */
+.profile-card:hover {
+  background-color: #f2f2f2;
+}
 .profile-picture {
-  width: 50%; /* Adjust size as needed */
-  height: 50%; /* Adjust size as needed */
-  border-radius: 50%; /* Circular shape */
-  margin-right: 20px;
-  object-fit: fill; /* Ensures the image is not distorted */
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
 }
 
-.profile-info {
-  flex-grow: 1;
+.contact-info {
+  display: flex;
+  flex-direction: column;
 }
 
-.profile-name {
-  color: var(--text-color); /* Primary text color */
+.contact-name {
   font-weight: bold;
+  color: var(--navbar-text); /* Adjust color as needed */
 }
 
-.profile-status {
+.contact-status {
+  color: #888; /* Greyed text */
   font-size: 0.8em;
-  color: var(--secondary-color);
 }
+
 
 /* Profile Dropdown */
 .profile-dropdown {
