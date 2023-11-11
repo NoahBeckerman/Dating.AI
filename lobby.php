@@ -28,11 +28,11 @@ if (isset($_POST["character_ID"])) {
 
         <!-- Toggle Buttons for View -->
         <div class="view-toggle">
-            <button id="listViewButton" class="btn btn-secondary">List View</button>
-            <button id="cardViewButton" class="btn btn-secondary">Card View</button>
+            <button id="list-view-btn" class="btn btn-secondary">List View</button>
+            <button id="card-view-btn" class="btn btn-secondary">Card View</button>
         </div>
 
-      
+      <br>
 
         <div id="charactersContainer" class="characters-container card-view">
     <?php

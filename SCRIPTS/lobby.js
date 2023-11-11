@@ -16,18 +16,22 @@ document.addEventListener('DOMContentLoaded', function() {
           personality.style.display = 'none';
         }
       });
+
+      
+    });
+      // Event listener for List View button
+      document.getElementById('list-view-btn').addEventListener('click', function() {
+        document.querySelector('.character-card').classList.add('list-view');
+        document.querySelector('.character-card').classList.remove('card-view');
+    });
+
+    // Event listener for Card View button
+    document.getElementById('card-view-btn').addEventListener('click', function() {
+        document.querySelector('.character-card').classList.add('card-view');
+        document.querySelector('.character-card').classList.remove('list-view');
     });
   
     // Toggle between grid and carousel views
     // This part can be customized further based on your specific requirements
   });
 
-  document.getElementById('listViewButton').addEventListener('click', function() {
-    document.querySelector('.character-container').classList.add('list-view');
-    document.querySelector('.character-container').classList.remove('card-view');
-});
-
-document.getElementById('cardViewButton').addEventListener('click', function() {
-    document.querySelector('.character-container').classList.add('card-view');
-    document.querySelector('.character-container').classList.remove('list-view');
-});

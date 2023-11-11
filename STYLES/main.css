@@ -417,6 +417,15 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   margin-bottom: 10px; /* Space for tags */
 }
 
+.character-container.card-view .character-card {
+  flex: 0 1 calc(33.333% - 20px); /* Adjust as per your card size */
+}
+
+.character-container.list-view .character-card {
+  flex: 0 1 100%;
+}
+
+
 .character-card .card-tags {
   position: absolute;
   top: 220px; /* Adjust based on image height */
