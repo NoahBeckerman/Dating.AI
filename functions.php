@@ -327,6 +327,26 @@ function resetUserPassword($userId, $newPassword) {
 }
 
 /**
+ * Check if the user has a selected subscription plan.
+ *
+ * @param int $userId The ID of the user.
+ *
+ * @return bool True if the user has a selected plan, false otherwise.
+ */
+function subscribed($userId)
+{
+    $query = "SELECT plan_id FROM subscriptions WHERE user_id = ? AND status = 'active'";
+    $result = executeQuery($query, [$userId]);
+
+    if ($result && count($result) > 0 && $result[0]['plan_id'] != 0) {
+        return true;
+    }
+
+    return false;
+}
+
+
+/**
  * Retrieve the token limit for a specific personality ID.
  *
  * This function maps personality IDs to their respective token limits.

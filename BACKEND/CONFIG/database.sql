@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL,  -- Username chosen by the user
     email VARCHAR(50) NOT NULL,  -- User's email address
     age INT,  -- User's age
-    preferences VARCHAR(255),  -- User's preferences, possibly in JSON format
+    preferences JSON,  -- User's preferences, possibly in JSON format
     password VARCHAR(255) NOT NULL,  -- Hashed password for user authentication
     profile_picture VARCHAR(255),  -- URL or path to the user's profile picture
     addr1 VARCHAR(255),  -- Address line 1 for the user
@@ -130,8 +130,6 @@ CREATE TABLE IF NOT EXISTS UserDeletedConversation (
     FOREIGN KEY (personality_id) REFERENCES personalities(id)  -- Foreign key to personalities table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
 -- Create model_usage table if it doesn't exist
 CREATE TABLE IF NOT EXISTS model_usage (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each model usage entry
@@ -143,7 +141,6 @@ CREATE TABLE IF NOT EXISTS model_usage (
     tokens_received INT DEFAULT 0,  -- Tokens received by the user for using the model
     FOREIGN KEY (user_id) REFERENCES users(id)  -- Foreign key to users table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 -- Create billing_records table if it doesn't exist
 CREATE TABLE IF NOT EXISTS billing_records (
@@ -233,9 +230,6 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)  -- Foreign key to subscription_plans table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
-
 -- Test data for users table
 INSERT INTO users (username, email, age, preferences, password, profile_picture, addr1, addr2, zip, state, country, first_name, last_name, subscription, role, banned, signup_date, last_login, total_messages_sent, total_cost_of_queries, tokens_sent, tokens_received) VALUES
 ('JohnDoe', 'john.doe@example.com', NULL, NULL, 'password123', NULL, '123 Main St', 'Apt 4', '12345', 'NY', 'USA', 'John', 'Doe', 1, 0, FALSE, '2023-10-22 07:29:33', '2023-10-22 07:29:33', 10, 5.00, 100, 50),
@@ -284,13 +278,6 @@ VALUES (1, 1, 'Discussed latest technology trends');
 INSERT INTO learning_outcomes (user_id, character_id, learned_data, relationship_level)
 VALUES (1, 1, JSON_OBJECT('favorite_topics', JSON_ARRAY('AI', 'Machine Learning')), 3);
 
--- Test data for personalities table OLD TABLE FOR CHARACTERS TABLE. 
--- INSERT INTO personalities (first_name, last_name, profile_picture, description, notes, likes, dislikes, sex, location, engine) VALUES
--- ('John', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'Friendly and outgoing.', 'Loves to chat.', 'Coffee, Books', 'Loud noises', 'male', 'New York', 'gpt-3.5-turbo-16k'),
--- ('Jane', 'Doe', 'AI-CHARACTERS\\2\\front-view-smiling-woman.jpg', 'Introverted but thoughtful.', 'Enjoys solitude.', 'Reading, Music', 'Crowds', 'female', 'San Francisco', 'gpt-3.5-turbo-16k'),
--- ('Eve', 'Adams', 'AI-CHARACTERS\\3\\eve_adams.jpg', 'Adventurous and creative.', 'Seeks new experiences.', 'Travel, Photography', 'Routine', 'female', 'Austin', 'gpt-3.5-turbo-16k'),
--- ('Adam', 'Johnson', 'AI-CHARACTERS\\4\\adam_johnson.jpg', 'Analytical and curious.', 'Problem solver.', 'Puzzles, Technology', 'Inefficiency', 'male', 'Seattle', 'gpt-3.5-turbo-16k');
-
 -- Test data for chat_history table
 INSERT INTO chat_history (user_id, personality_id, message, response, timestamp) VALUES
 (1, 1, 'Hello John!', 'Hi there! How are you?', CURRENT_TIMESTAMP),
@@ -314,3 +301,10 @@ INSERT INTO subscriptions (user_id, plan_id, start_date, end_date, status) VALUE
 -- Role and Subscription Classification:
 -- Roles: 0 = New User, 1 = Moderator, 2 = Admin, 3 = Superadmin, 100 = Owner.
 -- Subscriptions: 1 = Tier One Subscription, 2 = Tier Two Subscription, 3 = Tier Three Subscription (VIP).
+
+-- Test data for personalities table OLD TABLE FOR CHARACTERS TABLE. 
+-- INSERT INTO personalities (first_name, last_name, profile_picture, description, notes, likes, dislikes, sex, location, engine) VALUES
+-- ('John', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'Friendly and outgoing.', 'Loves to chat.', 'Coffee, Books', 'Loud noises', 'male', 'New York', 'gpt-3.5-turbo-16k'),
+-- ('Jane', 'Doe', 'AI-CHARACTERS\\2\\front-view-smiling-woman.jpg', 'Introverted but thoughtful.', 'Enjoys solitude.', 'Reading, Music', 'Crowds', 'female', 'San Francisco', 'gpt-3.5-turbo-16k'),
+-- ('Eve', 'Adams', 'AI-CHARACTERS\\3\\eve_adams.jpg', 'Adventurous and creative.', 'Seeks new experiences.', 'Travel, Photography', 'Routine', 'female', 'Austin', 'gpt-3.5-turbo-16k'),
+-- ('Adam', 'Johnson', 'AI-CHARACTERS\\4\\adam_johnson.jpg', 'Analytical and curious.', 'Problem solver.', 'Puzzles, Technology', 'Inefficiency', 'male', 'Seattle', 'gpt-3.5-turbo-16k');

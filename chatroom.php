@@ -1,12 +1,17 @@
 <?php
 require_once "functions.php";
 
+$userId = $_SESSION["user_id"];
 // Check if user is logged in, otherwise redirect to login page
 if (!isLoggedIn()) {
     redirect("login.php");
 }
 
-$userId = $_SESSION["user_id"];
+if (subscribed($userId) == false) {
+    redirect("lobby.php");
+}
+
+
 if (isset($_GET["personality_id"])) {
     $personalityId = $_GET["personality_id"];
     $_SESSION["personality_id"] = $personalityId;

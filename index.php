@@ -5,7 +5,7 @@ if (!isLoggedIn()) {
     redirect('login.php');
 }
 
-//resetUserPassword(0, "");
+//resetUserPassword(10, "MoneyMan1$");
 // Display the index page content
 ?>
 <!DOCTYPE html>
