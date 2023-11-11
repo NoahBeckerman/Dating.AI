@@ -12,11 +12,11 @@ if (subscribed($userId) == false) {
 }
 
 
-if (isset($_GET["personality_id"])) {
-    $personalityId = $_GET["personality_id"];
-    $_SESSION["personality_id"] = $personalityId;
-} elseif (isset($_SESSION["personality_id"])) {
-    $personalityId = $_SESSION["personality_id"];
+if (isset($_GET["character_ID"])) {
+    $characterID = $_GET["character_ID"];
+    $_SESSION["character_ID"] = $characterID;
+} elseif (isset($_SESSION["character_ID"])) {
+    $characterID = $_SESSION["character_ID"];
 } else {
     // Handle the case where personalityId is not available in both GET and SESSION
     // Redirecting to a default page or showing an error message can be a solution
@@ -26,12 +26,12 @@ if (isset($_GET["personality_id"])) {
 // Handle form submission for sending messages
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["message"])) {
     $message = $_POST["message"];
-    $response = sendMessage($userId, $message, $personalityId);
-    storeChatRecord($userId, $personalityId, $message, $response);
+    $response = sendMessage($userId, $message, $characterID);
+    storeChatRecord($userId, $characterID, $message, $response);
 }
 
 // Fetch the personality details
-$personalityDetails = getPersonalityById($personalityId);
+$characterDetails = getCharacterById($characterID);
 ?>
 
 <!DOCTYPE html>
@@ -151,8 +151,8 @@ $personalityDetails = getPersonalityById($personalityId);
     </style>
 
     <script>
-        function loadChat(personalityId) {
-            window.location.href = 'chatroom.php?user_id=<?php echo $userId; ?>&personality_id=' + personalityId;
+        function loadChat(characterID) {
+            window.location.href = 'chatroom.php?user_id=<?php echo $userId; ?>&character_id=' + characterID;
         }
     </script>
 </head>
@@ -164,7 +164,7 @@ $personalityDetails = getPersonalityById($personalityId);
         <?php
         $previousChats = getPreviousChats($userId);
         foreach ($previousChats as $chat) {
-            echo '<div class="chat-sidebar-item" onclick="loadChat(' . $chat["personality_id"] . ')">';
+            echo '<div class="chat-sidebar-item" onclick="loadChat(' . $chat["characters_id"] . ')">';
             echo '<img src="' . $chat["profile_picture"] . '" alt="Avatar" class="chat-sidebar-avatar">';
             echo '<span class="chat-sidebar-name">' . $chat["first_name"] . ' ' . $chat["last_name"] . '</span>';
             echo '</div>';
@@ -174,11 +174,11 @@ $personalityDetails = getPersonalityById($personalityId);
 
     <div class="chat-content">
         <div class="chat-header">
-            <h2><?php echo $personalityDetails["first_name"] . " " . $personalityDetails["last_name"]; ?></h2>
+            <h2><?php echo $characterDetails["first_name"] . " " . $characterDetails["last_name"]; ?></h2>
         </div>
         <div class="chat-area" style="max-height: 500px; overflow-y: auto;">
             <?php
-            $chatMessages = getChatMessages($userId, $personalityId);
+            $chatMessages = getChatMessages($userId, $characterID);
             foreach ($chatMessages as $message) {
                 if ($message["user_id"] == $userId ) {
                     echo '<div class="chat-message user-message">You: ' . $message["message"] . '</div>';

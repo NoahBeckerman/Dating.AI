@@ -114,32 +114,32 @@ function importDatabase()
  */
 function getChatHistory($userId)
 {
-    $query = "SELECT chat_history.*, personalities.first_name, personalities.last_name
+    $query = "SELECT chat_history.*, characters.first_name, characters.last_name
               FROM chat_history
-              INNER JOIN personalities ON chat_history.personality_id = personalities.id
+              INNER JOIN characters ON chat_history.characters_id = characters.id
               WHERE chat_history.user_id = ?
               ORDER BY chat_history.timestamp DESC";
     return executeQuery($query, [$userId]);
 }
 
 /**
- * Get chat history for a user and a specific personality, limited to the last 5 messages.
+ * Get chat history for a user and a specific character, limited to the last 5 messages.
  *
- * This function fetches the last 5 chat messages between a user and a specific personality.
+ * This function fetches the last 5 chat messages between a user and a specific character.
  * The messages are returned in reverse order to have the latest messages at the end.
  *
  * @param int $userId The user ID.
- * @param int $personalityId The personality ID.
+ * @param int $character_ID The character ID.
  * @return array|bool The reversed array of the last 5 chat messages, or false on failure.
  * Note: The function name ends with "MEMORY" to indicate that it fetches a limited set of recent chat messages for performance reasons.
  */
-function getChatHistoryMEMORY($userId, $personalityId)
+function getChatHistoryMEMORY($userId, $character_ID)
 {
     // SQL query to fetch chat history
-    $sql = "SELECT * FROM chat_history WHERE user_id = ? AND personality_id = ? ORDER BY timestamp DESC LIMIT 5";
+    $sql = "SELECT * FROM chat_history WHERE user_id = ? AND characters_id = ? ORDER BY timestamp DESC LIMIT 10";
 
     // Execute the query
-    $result = executeQuery($sql, [$userId, $personalityId]);
+    $result = executeQuery($sql, [$userId, $character_ID]);
 
     if ($result !== false) {
         return array_reverse($result); // Reverse to get the latest 5 messages at the end
@@ -157,37 +157,37 @@ function getChatHistoryMEMORY($userId, $personalityId)
  */
 function getPreviousChats($userId)
 {
-    $query = "SELECT DISTINCT chat_history.personality_id, personalities.first_name, personalities.last_name, personalities.profile_picture
+    $query = "SELECT DISTINCT chat_history.characters_id, characters.first_name, characters.last_name, characters.profile_picture
               FROM chat_history
-              INNER JOIN personalities ON chat_history.personality_id = personalities.id
+              INNER JOIN characters ON chat_history.characters_id = characters.id
               WHERE chat_history.user_id = ?";
     return executeQuery($query, [$userId]);
 }
 
 
 /**
- * Get the chat messages for a user and personality.
+ * Get the chat messages for a user and character.
  *
  * @param int $userId The user ID.
- * @param int $personalityId The personality ID.
+ * @param int $character_ID The character ID.
  * @return array The chat messages.
  */
-function getChatMessages($userId, $personalityId)
+function getChatMessages($userId, $character_ID)
 {
     $query = "SELECT message, response, user_id FROM chat_history
-              WHERE user_id = ? AND personality_id = ?
+              WHERE user_id = ? AND characters_id = ?
               ORDER BY timestamp ASC";
-    return executeQuery($query, [$userId, $personalityId]);
+    return executeQuery($query, [$userId, $character_ID]);
 }
 
 /**
- * Get the list of personalities.
+ * Get the list of characters.
  *
- * @return array The list of personalities.
+ * @return array The list of characters.
  */
-function getPersonalities()
+function getCharacters()
 {
-    $query = "SELECT * FROM personalities";
+    $query = "SELECT * FROM characters";
     return executeQuery($query);
 }
 
@@ -208,15 +208,15 @@ function getUserByUsernameOrEmail($usernameOrEmail)
  * Store a chat record in the database.
  *
  * @param int $userId The user ID.
- * @param int $personalityId The personality ID.
+ * @param int $character_ID The character ID.
  * @param string $message The user message.
  * @param string $response The AI response.
  */
-function storeChatRecord($userId, $personalityId, $message, $response)
+function storeChatRecord($userId, $character_ID, $message, $response)
 {
-    $query = "INSERT INTO chat_history (user_id, personality_id, message, response)
+    $query = "INSERT INTO chat_history (user_id, characters_id, message, response)
               VALUES (?, ?, ?, ?)";
-    executeNonQuery($query, [$userId, $personalityId, $message, $response]);
+    executeNonQuery($query, [$userId, $character_ID, $message, $response]);
 }
 
 /**
@@ -224,71 +224,71 @@ function storeChatRecord($userId, $personalityId, $message, $response)
  *
  * @param int $userId The ID of the user sending the message.
  * @param string $message The message text from the user.
- * @param int $personalityId The ID of the AI personality to interact with.
+ * @param int $character_ID The ID of the AI character to interact with.
  *
  * @return string The AI's response.
  *
  * This function performs several key tasks:
- * 1. Retrieves the context for the user and the AI personality.
+ * 1. Retrieves the context for the user and the AI character.
  * 2. Limits the conversation history to manage token usage.
- * 3. Constructs a comprehensive prompt for the AI, including user context, personality context, and conversation history.
+ * 3. Constructs a comprehensive prompt for the AI, including user context, character context, and conversation history.
  * 4. Makes an API call to OpenAI to generate the AI's response.
  *
  * The AI's response is based on the constructed prompt, which includes:
  * - User context like username and preferences.
- * - Personality context including role-playing guidelines and character attributes.
+ * - character context including role-playing guidelines and character attributes.
  * - Limited conversation history for context.
  *
  * The function assumes that the following helper functions exist and return the expected types of data:
- * - getPersonalityById()
+ * - getCharacterById()
  * - getUserById()
  * - getChatHistory()
  *
  * The OpenAI API call is made through the openaiApiCall() function.
- * Note: This function assumes the existence of helper functions like getPersonalityById(), getUserById(), and getChatHistory(). Make sure these functions are implemented and accessible.
+ * Note: This function assumes the existence of helper functions like getCharacterById(), getUserById(), and getChatHistory(). Make sure these functions are implemented and accessible.
  */
-function sendMessage($userId, $message, $personalityId)
+function sendMessage($userId, $message, $character_ID)
 {
-    // Fetch Personality Context
-    $personality = getPersonalityById($personalityId);
-    $engine = $personality["engine"];
+    // Fetch character Context
+    $character = getCharacterById($character_ID);
+    $engine = $character["ai_model_type"];
 
     // Fetch User Context
     $user = getUserById($userId);
 
-    // Construct the User and Personality Context
+    // Construct the User and character Context
     $context = "======";
     $context .= "\n";
     $context .= "[Users Context]\n";
-    $context .= "First Name: {$user["first_name"]}, Last Name: {$user["last_name"]}, Age: {$user["age"]}, Preferences: {$user["preferences"]}\n";
+    $context .= "First Name: {$user["first_name"]}, Last Name: {$user["last_name"]}, Age: {$user["age"]}, Personality Traits: {$user["personality_traits"]}\n";
     $context .= "\n";
     $context .= "\n=====";
     $context .= "\n";
-    $context .= "[Your Personality Context]\n";
+    $context .= "[Your character Context]\n";
     $context .= "\n";
-    $context .= "Description: {$personality["description"]}\n";
+    $context .= "Bio: {$character["bio"]}\n";
     $context .= "\n";
-    $context .= "Notes: {$personality["notes"]}\n";
+    $context .= "Cultural References: {$character["cultural_references"]}\n";
     $context .= "\n";
-    $context .= "Likes: {$personality["likes"]}\n";
+    $context .= "Interest: {$character["interest"]}\n";
     $context .= "\n";
-    $context .= "Dislikes: {$personality["dislikes"]}\n";
+    $context .= "Dislikes: {$character["dislikes"]}\n";
     $context .= "\n";
-    $context .= "Sex: {$personality["sex"]}\n";
+    $context .= "Sex: {$character["sex"]}\n";
     $context .= "\n";
-    $context .= "Location: {$personality["location"]}\n";
+    $context .= "Current Location: {$character["current_location"]}\n";
     $context .= "\n";
     $context .= "\n===";
     $context .= "\n";
-    $context .= "Reminder: You are pretending and roleplaying to be {$personality["first_name"]} {$personality["last_name"]}, with the user and will reply in the context of the personality you have been provided to the best of your ability without eluding to the user you are role playing. DO NOT RESPOND WITH ANY DATA FROM UP THE Conversation History UNLESS THE USER REQUEST CONTEXT. FURTHERMORE DO NOT START THE CONVERSATION MESSAGE WITH YOUR NAME OR 'Response:', THEY KNOW WHO YOU ARE.\n";
+    $context .= "Reminder: You are pretending and roleplaying to be {$character["first_name"]} {$character["last_name"]}, with the user and will reply in the context of the character you have been provided to the best of your ability without eluding to the user you are role playing. Your main objective is to make the user relate, and like you. DO NOT RESPOND WITH ANY DATA FROM THE Conversation History UNLESS THE USER REQUEST CONTEXT. FURTHERMORE DO NOT START THE CONVERSATION MESSAGE WITH YOUR NAME OR 'Response:', THEY KNOW WHO YOU ARE.\n";
     $context .= "You will be provided this message everytime you talk with a user, this is all contextual information for you to remain in your roleplaying with the user. Please use this information to help you continue a conversation withought breaking the roleplay EVER. This context message will end with five (x)'s.\n";
     $context .= "\n";
     $context .= "[Prior Conversation History With The User]\n";
     // Fetch Limited Conversation History
-    $chatHistory = getChatHistoryMEMORY($userId, $personalityId);
+    $chatHistory = getChatHistoryMEMORY($userId, $character_ID);
 
     // If you still want to limit it to the last 5 messages, you can use array_slice
-    $chatHistory = array_slice($chatHistory, 0, 5);
+    $chatHistory = array_slice($chatHistory, 0, 10);
 
     // Append the chat history to the context
    foreach ($chatHistory as $chat) {
@@ -315,7 +315,7 @@ $context .= "xxxxx";
             break;
     }
     // Make the API call
-    $response = openaiApiCall($prompt, $messages, $engine, $personalityId);
+    $response = openaiApiCall($prompt, $messages, $engine, $character_ID);
     return $response;
 }
 
@@ -347,17 +347,17 @@ function subscribed($userId)
 
 
 /**
- * Retrieve the token limit for a specific personality ID.
+ * Retrieve the token limit for a specific character ID.
  *
- * This function maps personality IDs to their respective token limits.
- * It returns the token limit for the given personality ID.
+ * This function maps character IDs to their respective token limits.
+ * It returns the token limit for the given character ID.
  *
- * @param int $personalityId The personality ID.
- * @return int|null The token limit for the personality, or null if not found.
+ * @param int $character_ID The character ID.
+ * @return int|null The token limit for the character, or null if not found.
  */
-function getTokenLimitByPersonalityId($personalityId)
+function getTokenLimitByCharacterId($character_ID)
 {
-    // Mapping of personality IDs to token limits
+    // Mapping of character IDs to token limits
     $tokenLimits = [
         "gpt-4-32k" => 32768,
         "gpt-4" => 8192,
@@ -368,7 +368,7 @@ function getTokenLimitByPersonalityId($personalityId)
         // Add other models here
     ];
 
-    return $tokenLimits[$personalityId] ?? null;
+    return $tokenLimits[$character_ID] ?? null;
 }
 
 
@@ -398,28 +398,28 @@ function currentUserIsAdmin() {
 }
 
 /**
- * Get the engine for a specific personality ID.
+ * Get the engine for a specific character ID.
  *
- * @param int $personalityId The personality ID.
- * @return string The engine for the personality.
+ * @param int $character_ID The character ID.
+ * @return string The engine for the character.
  */
-function getEngineByPersonalityId($personalityId)
+function getCharacterByCharacterId($character_ID)
 {
-    $query = "SELECT engine FROM personalities WHERE id = ?";
-    $result = executeQuery($query, [$personalityId]);
+    $query = "SELECT ai_model_type FROM characters WHERE id = ?";
+    $result = executeQuery($query, [$character_ID]);
     return $result[0] ?? null;
 }
 
 /**
- * Get a personality by ID.
+ * Get a character by ID.
  *
- * @param int $personalityId The personality ID.
- * @return array|null The personality data or null if not found.
+ * @param int $character_ID The character ID.
+ * @return array|null The character data or null if not found.
  */
-function getPersonalityById($personalityId)
+function getCharacterById($character_ID)
 {
-    $query = "SELECT * FROM personalities WHERE id = ?";
-    $result = executeQuery($query, [$personalityId]);
+    $query = "SELECT * FROM characters WHERE id = ?";
+    $result = executeQuery($query, [$character_ID]);
     return $result[0] ?? null;
 }
 
@@ -466,13 +466,13 @@ function migrateAndDeleteChatHistory($userId)
 
     // SQL query to migrate chat history to UserDeletedConversation table
     $insertQuery =
-        "INSERT INTO UserDeletedConversation (user_id, personality_id, message, response, timestamp) VALUES (?, ?, ?, ?, ?)";
+        "INSERT INTO UserDeletedConversation (user_id, characters_id, message, response, timestamp) VALUES (?, ?, ?, ?, ?)";
 
     // Loop through each chat record and migrate it
     foreach ($chatHistory as $record) {
         $params = [
             $record["user_id"],
-            $record["personality_id"],
+            $record["characters_id"],
             $record["message"],
             $record["response"],
             $record["timestamp"],
@@ -754,13 +754,13 @@ function estimate_tokens($text, $method = "max")
  * @param string $prompt The user message prompt.
  * @param string $engine The engine to use for the API call.
  * @param array $messages Optional array of messages for conversational context.
- * @param string $personality The personality setting for the API call.
+ * @param string $character The character setting for the API call.
  * @return string The generated response from the API.
  */
-function openaiApiCall($prompt, $messages, $engine, $personality)
+function openaiApiCall($prompt, $messages, $engine, $character)
 {
     $api_key = OPENAI_API_KEY;
-    $max_tokens = getTokenLimitByPersonalityId($engine);
+    $max_tokens = getTokenLimitByCharacterId($engine);
     $temperature = TEMPERATURE;
 
     $token_estimate =

@@ -39,16 +39,6 @@ CREATE TABLE IF NOT EXISTS users (
     tokens_received INT DEFAULT 0  -- Number of tokens received by the user
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create personalities table if it doesn't exist
--- This table stores information about different personalities available in the app.
--- It includes personal details and characteristics of each personality.
-CREATE TABLE IF NOT EXISTS personalities (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each personality
-    name VARCHAR(50),  -- Name of the personality
-    description TEXT,  -- Description of the personality
-    traits JSON  -- JSON field containing various traits of the personality
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Create characters table if it doesn't exist
 -- This table stores detailed information about each character created in the app.
 CREATE TABLE IF NOT EXISTS characters (
@@ -83,11 +73,11 @@ CREATE TABLE IF NOT EXISTS characters (
 -- This table stores the history of interactions between users and characters.
 CREATE TABLE IF NOT EXISTS interaction_history (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each interaction record
-    character_id INT UNSIGNED,  -- ID of the character involved in the interaction
+    characters_id INT UNSIGNED,  -- ID of the character involved in the interaction
     user_id INT UNSIGNED,  -- ID of the user involved in the interaction
     interaction_details TEXT,  -- Detailed description or log of the interaction
     interaction_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of when the interaction occurred
-    FOREIGN KEY (character_id) REFERENCES characters(id),  -- Linking to the characters table
+    FOREIGN KEY (characters_id) REFERENCES characters(id),  -- Linking to the characters table
     FOREIGN KEY (user_id) REFERENCES users(id)  -- Linking to the users table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -96,12 +86,12 @@ CREATE TABLE IF NOT EXISTS interaction_history (
 CREATE TABLE IF NOT EXISTS learning_outcomes (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each learning outcome record
     user_id INT UNSIGNED,  -- ID of the user associated with the learning outcome
-    character_id INT UNSIGNED,  -- ID of the character associated with the learning outcome
+    characters_id INT UNSIGNED,  -- ID of the character associated with the learning outcome
     learned_data JSON,  -- JSON field containing data learned about the user
     relationship_level INT,  -- Metric to gauge the user-character bond
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the last update to the learning outcome
     FOREIGN KEY (user_id) REFERENCES users(id),  -- Linking to the users table
-    FOREIGN KEY (character_id) REFERENCES characters(id)  -- Linking to the characters table
+    FOREIGN KEY (characters_id) REFERENCES characters(id)  -- Linking to the characters table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -109,12 +99,12 @@ CREATE TABLE IF NOT EXISTS learning_outcomes (
 CREATE TABLE IF NOT EXISTS chat_history (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each chat entry
     user_id INT UNSIGNED,  -- ID of the user involved in the chat
-    personality_id INT UNSIGNED,  -- ID of the personality involved in the chat
+    characters_id INT UNSIGNED,  -- ID of the character involved in the chat
     message TEXT NOT NULL,  -- The message sent by the user
-    response TEXT NOT NULL,  -- The response from the personality
+    response TEXT NOT NULL,  -- The response from the character
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the chat
     FOREIGN KEY (user_id) REFERENCES users(id),  -- Foreign key to users table
-    FOREIGN KEY (personality_id) REFERENCES personalities(id)  -- Foreign key to personalities table
+    FOREIGN KEY (characters_id) REFERENCES characters(id)  -- Foreign key to personalities table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -122,12 +112,12 @@ CREATE TABLE IF NOT EXISTS chat_history (
 CREATE TABLE IF NOT EXISTS UserDeletedConversation (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each deleted conversation entry
     user_id INT UNSIGNED,  -- ID of the user involved in the deleted conversation
-    personality_id INT UNSIGNED,  -- ID of the personality involved in the deleted conversation
+    characters_id INT UNSIGNED,  -- ID of the character involved in the deleted conversation
     message TEXT NOT NULL,  -- The message that was deleted
     response TEXT NOT NULL,  -- The response that was deleted
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the deletion
     FOREIGN KEY (user_id) REFERENCES users(id),  -- Foreign key to users table
-    FOREIGN KEY (personality_id) REFERENCES personalities(id)  -- Foreign key to personalities table
+    FOREIGN KEY (characters_id) REFERENCES characters(id)  -- Foreign key to personalities table
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create model_usage table if it doesn't exist
@@ -232,8 +222,8 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 
 -- Test data for users table
 INSERT INTO users (username, email, age, preferences, password, profile_picture, addr1, addr2, zip, state, country, first_name, last_name, subscription, role, banned, signup_date, last_login, total_messages_sent, total_cost_of_queries, tokens_sent, tokens_received) VALUES
-('JohnDoe', 'john.doe@example.com', NULL, NULL, 'password123', NULL, '123 Main St', 'Apt 4', '12345', 'NY', 'USA', 'John', 'Doe', 1, 0, FALSE, '2023-10-22 07:29:33', '2023-10-22 07:29:33', 10, 5.00, 100, 50),
-('JaneDoe', 'jane.doe@example.com', NULL, NULL, 'password123', NULL, '456 Elm St', 'Suite 789', '67890', 'CA', 'USA', 'Jane', 'Doe', 2, 1, FALSE, '2023-10-22 07:29:33', '2023-10-22 07:29:33', 20, 10.00, 200, 150),
+('JohnDoe', 'john.doe@example.com', 30, NULL, '$2y$10$GCE6n.56fMVoHLjtNcZbD.sbE1mcFuzZveICmLZVbYgsKdXBVuOTK', NULL, '123 Main St', 'Apt 4', '12345', 'NY', 'USA', 'John', 'Doe', 1, 0, FALSE, '2023-11-08 01:07:55', '2023-11-10 17:20:52', 10, 5, 100, 50),
+('JaneDoe', 'jane.doe@example.com', 28, NULL, 'password123', NULL, '456 Elm St', 'Suite 789', '67890', 'CA', 'USA', 'Jane', 'Doe', 2, 1, FALSE, '2023-11-08 01:07:55', '2023-11-08 01:07:55', 20, 10, 200, 150),
 
 -- Test data for model_usage table
 INSERT INTO model_usage (user_id, model_name, usage_count, last_used, tokens_sent, tokens_received) VALUES
@@ -259,31 +249,31 @@ INSERT INTO system_health (metric_name, metric_value) VALUES
 ('Peak Load', '75%');
 
 -- Test data for user_activity table
-INSERT INTO user_activity (user_id, action_type, action_description) VALUES
-(1, 'Login', 'User logged in from IP: 192.168.1.1'),
-(2, 'Profile Update', 'User updated profile picture'),
-(3, 'Message', 'User sent a message to personality_id: 1'),
-(4, 'Subscription', 'User upgraded to Tier Three Subscription'),
-(5, 'Login', 'User logged in from IP: 172.16.254.1');
+INSERT INTO user_activity (user_id, activity_type, activity_description, activity_timestamp) VALUES
+(1, 'Login', 'User logged in from IP: 192.168.1.1', CURRENT_TIMESTAMP),
+(2, 'Profile Update', 'User updated profile picture', CURRENT_TIMESTAMP),
+(3, 'Message', 'User sent a message to personality_id: 1', CURRENT_TIMESTAMP),
+(4, 'Subscription', 'User upgraded to Tier Three Subscription', CURRENT_TIMESTAMP),
+(5, 'Login', 'User logged in from IP: 172.16.254.1', CURRENT_TIMESTAMP);
 
 -- Example test data for characters table
 INSERT INTO characters (first_name, last_name, profile_picture, current_location, sex, age, bio, interests, dislikes, personality_traits, physical_characteristics, voice_tone, style_of_interaction, ai_model_type, customization_options, status, availability_schedule, creator_user_id, language_preferences, cultural_references, emotional_intelligence_level)
-VALUES ('Alex', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'New York', 'Male', 30, 'Friendly and knowledgeable AI companion', JSON_ARRAY('reading', 'coding'), JSON_ARRAY('loud noises'), JSON_OBJECT('kind', 'true', 'intelligent', 'true'), JSON_OBJECT('height', '6ft', 'hair_color', 'brown'), 'Calm and soothing', 'Casual', 'gpt-4-1106-preview', JSON_OBJECT('hair_style', 'short', 'eye_color', 'blue'), 'active', JSON_OBJECT('weekdays', '9am-5pm'), 1, JSON_ARRAY('English', 'Spanish'), 'Enjoys American and Spanish culture', 5);
+VALUES ('Alex', 'Smith', 'AI-CHARACTERS\\1\\istockphoto-639805094-612x612.jpg', 'New York', 'Male', 30, 'Friendly and knowledgeable AI companion', '["reading", "coding"]', '["loud noises"]', '{"kind": "true", "intelligent": "true"}', '{"height": "6ft", "hair_color": "brown"}', 'Calm and soothing', 'Casual', 'gpt-4-1106-preview', '{"hair_style": "short", "eye_color": "blue"}', 'active', '{"weekdays": "9am-5pm"}', 1, '["English", "Spanish"]', 'Enjoys American and Spanish culture', 5);
 
 -- Example test data for interaction_history table
-INSERT INTO interaction_history (character_id, user_id, interaction_details)
+INSERT INTO interaction_history (characters_id, user_id, interaction_details)
 VALUES (1, 1, 'Discussed latest technology trends');
 
 -- Example test data for learning_outcomes table
-INSERT INTO learning_outcomes (user_id, character_id, learned_data, relationship_level)
+INSERT INTO learning_outcomes (user_id, characters_id, learned_data, relationship_level)
 VALUES (1, 1, JSON_OBJECT('favorite_topics', JSON_ARRAY('AI', 'Machine Learning')), 3);
 
 -- Test data for chat_history table
-INSERT INTO chat_history (user_id, personality_id, message, response, timestamp) VALUES
+INSERT INTO chat_history (user_id, characters_id, message, response, timestamp) VALUES
 (1, 1, 'Hello John!', 'Hi there! How are you?', CURRENT_TIMESTAMP),
-(2, 2, 'Hi Jane.', 'Hello! How can I assist you today?', CURRENT_TIMESTAMP),
-(3, 3, 'Hey Eve, got any travel tips?', 'Sure! Have you ever visited the Grand Canyon?', CURRENT_TIMESTAMP),
-(4, 4, 'Adam, I need help with my computer.', 'Of course! What seems to be the issue?', CURRENT_TIMESTAMP),
+(2, 1, 'Hi Jane.', 'Hello! How can I assist you today?', CURRENT_TIMESTAMP),
+(3, 1, 'Hey Eve, got any travel tips?', 'Sure! Have you ever visited the Grand Canyon?', CURRENT_TIMESTAMP),
+(4, 1, 'Adam, I need help with my computer.', 'Of course! What seems to be the issue?', CURRENT_TIMESTAMP),
 (5, 1, 'Good morning, John.', 'Good morning! What can I do for you today?', CURRENT_TIMESTAMP);
 
 INSERT INTO subscription_plans (name, price, duration, description, status) VALUES
