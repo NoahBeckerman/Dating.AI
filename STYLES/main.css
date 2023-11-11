@@ -47,15 +47,6 @@ header.site-header {
 }
 
 /* Navbar Styles */
-.site-header {
-  background-color: var(--header-footer-bg);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 1000;
-}
-
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -91,12 +82,11 @@ header.site-header {
   border-radius: 5px;
 }
 
-
 main {
   padding-top: 54px; /* Height of the header, adjust as needed */
-  height: calc(100vh - 54px - 66px); /* Replace X with your header's height */
+  height: calc(100vh - 54px - 66px); /* Adjust for header/footer height */
   margin: 0;
-  overflow-y: auto; /* Add scroll if content overflows */
+  overflow-y: auto;
 }
 
 /* Footer Styles */
@@ -117,27 +107,25 @@ footer p {
 
 /* Popup Box Styles (Modal) */
 .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  display: none;
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: var(--modal-overlay); /* Black w/ opacity */
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: var(--modal-overlay);
 }
 
 .modal-content {
   background-color: var(--modal-bg);
-  margin: 15% auto; /* 15% from the top and centered */
+  margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-  max-width: 600px; /* Adjust as needed */
+  width: 80%;
+  max-width: 600px;
 }
-
-
 
 .close {
   color: #aaa;
@@ -166,7 +154,6 @@ footer p {
   margin-bottom: 20px;
 }
 
-/* Additional Utility Classes */
 .bg-light {
   background-color: #f8f9fa;
 }
@@ -232,16 +219,14 @@ button:hover {
 input[type='text'], input[type='password'], input[type='email'], select, textarea {
   width: 100%;
   margin: 5px 0;
-  border: 2px solid var(--input-border);
+  border: 1px solid var(--input-border);
   padding: 10px 15px;
   font-size: 1rem;
   box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  border: 1px solid var(--input-border);
   border-radius: 5px;
   background-color: var(--input-bg);
   color: var(--text-color);
 }
-
 .password-container {
   position: relative;
   display: inline-block;
@@ -267,7 +252,6 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   justify-content: center;
   align-items: center;
   height: 100vh; /* Full viewport height */
-  
 }
 
 .login-form {
@@ -290,7 +274,6 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   font-weight: bold;
 }
 
-
 .btn-login {
   background-color: var(--button-bg);
   color: white;
@@ -306,11 +289,10 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   background-color: var(--button-bg-hover);
 }
 
-
 /* Chatroom Styles */
 .chatroom-container {
   display: flex;
-  height: calc(100vh - 54px - 66px); /* Replace X with your header's height */
+  height: calc(100vh - 54px - 66px); /* Adjust for header/footer height */
   background-color: var(--background-color);
   overflow: hidden;
 }
@@ -374,13 +356,58 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   text-align: left;
 }
 
-
 .message-input-area {
   padding: 10px;
   background: var(--header-footer-bg);
   border-top: 1px solid var(--input-border);
 }
 
+.character-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 20px; /* Adds space between cards */
+}
+
+.character-card {
+  flex: 0 1 calc(33.333% - 20px); /* Adjust for 3 cards per row, accounting for gap */
+  max-width: 300px; /* Adjust as needed */
+  margin: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.character-card .card-img-top {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.character-card .card-title {
+  font-size: 1.2em; /* Adjust as needed */
+  margin-bottom: 5px;
+}
+
+.character-card .card-text {
+  font-size: 0.9em; /* Adjust as needed */
+  color: #666;
+}
+
+.character-card .card-tags {
+  font-size: 0.8em;
+  color: #007bff;
+  margin-top: 10px;
+}
+
+.characters-container.list-view .character-card {
+  flex: 0 1 100%; /* Full width for list view */
+  margin-bottom: 10px;
+}
+
+.view-toggle button {
+  padding: 5px 10px;
+  margin: 10px;
+  cursor: pointer;
+}
 
 /* Profile Card Styles */
 .profile-card {
@@ -406,7 +433,7 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
 }
 
 .profile-name {
-  color: var(--text-color); /* This will apply the primary text color */
+  color: var(--text-color); /* Primary text color */
   font-weight: bold;
 }
 
@@ -414,6 +441,7 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   font-size: 0.8em;
   color: var(--secondary-color);
 }
+
 /* Profile Dropdown */
 .profile-dropdown {
   position: relative;
@@ -486,6 +514,10 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   .profile-dropdown {
     order: 3;
   }
+  
+  .character-card {
+    flex: 0 1 calc(50% - 20px); /* 2 cards per row on smaller screens */
+  }
 }
 
 @media (max-width: 600px) {
@@ -495,5 +527,11 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   }
 }
 
+@media (max-width: 480px) {
+  .character-card {
+    flex: 0 1 100%; /* 1 card per row on very small screens */
+  }
+}
+
 /* Additional Comments for Clarity */
-/* The CSS above is designed to provide a modern and user-friendly interface for your website. The use of CSS variables allows for easy theme customization, enabling users to select different color templates. The styles are meticulously crafted to ensure a seamless and responsive experience across various devices, with special attention to the chatroom layout, mimicking WhatsApp Web. The utility classes and modal styles are included for enhanced flexibility and user interaction. */
+/* The CSS above is designed to provide a modern and user-friendly interface for your website. The use of CSS variables allows for easy theme customization, enabling users to select different color templates. The styles are meticulously crafted to ensure a seamless and responsive experience across various devices, with special attention to the chatroom

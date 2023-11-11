@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchBar = document.getElementById('searchBar');
     const carouselContainer = document.getElementById('carouselContainer');
     const gridContainer = document.getElementById('gridContainer');
-    const personalities = document.querySelectorAll('.personality');
+    const personalities = document.querySelectorAll('.s');
   
     // Search bar functionality
     searchBar.addEventListener('input', function() {
@@ -21,3 +21,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle between grid and carousel views
     // This part can be customized further based on your specific requirements
   });
+
+  document.getElementById('list-view-btn').addEventListener('click', function() {
+    document.querySelector('.character-container').classList.add('list-view');
+    document.querySelector('.character-container').classList.remove('card-view');
+});
+
+document.getElementById('card-view-btn').addEventListener('click', function() {
+    document.querySelector('.character-container').classList.add('card-view');
+    document.querySelector('.character-container').classList.remove('list-view');
+});

@@ -42,7 +42,7 @@ $characterDetails = getCharacterById($characterID);
 
     <script>
         function loadChat(characterID) {
-            window.location.href = 'chatroom.php?user_id=<?php echo $userId; ?>&character_id=' + characterID;
+            window.location.href = 'chatroom.php?user_id=<?php echo $userId; ?>&character_ID=' + characterID;
         }
     </script>
 </head>
