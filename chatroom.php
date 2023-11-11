@@ -70,17 +70,24 @@ $characterDetails = getCharacterById($characterID);
         <div class="chat-header">
             <h2><?php echo $characterDetails["first_name"] . " " . $characterDetails["last_name"]; ?></h2>
         </div>
-        <div class="chat-area" style="">
-            <?php
-            $chatMessages = getChatMessages($userId, $characterID);
-            foreach ($chatMessages as $message) {
-                if ($message["user_id"] == $userId ) {
-                    echo '<div class="chat-message user-message">You: ' . $message["message"] . '</div>';
-                    echo '<div class="chat-message recipient-message">' . $message["response"] . '</div>';
-                } 
-            }
-            ?>
-        </div>
+
+        <div class="chat-area">
+    <?php
+    $chatMessages = getChatMessages($userId, $characterID);
+    foreach ($chatMessages as $message) {
+        if ($message["user_id"] == $userId) {
+            echo '<div class="chat-message-container user-message-container">';
+            echo '<div class="chat-message user-message">You: ' . $message["message"] . '</div>';
+            echo '</div>';
+       
+            echo '<div class="chat-message-container recipient-message-container">';
+            echo '<div class="chat-message recipient-message">' . $message["response"] . '</div>';
+            echo '</div>';
+        }
+    }
+    ?>
+</div>
+
         <div class="message-input-area">
             <form action="chatroom.php" method="POST">
                 <input type="text" id="message-input" name="message" placeholder="Type your message..." required>

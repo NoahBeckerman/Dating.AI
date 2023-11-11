@@ -28,8 +28,15 @@
                 </div>
             </div>
         <?php else: ?>
-            <a href="login.php" class="nav-link">Login</a>
-            <a href="signup.php" class="nav-link">Register</a>
+          <div class="profile-dropdown">
+                <button class="dropbtn">Login</button>
+                <div class="dropdown-content">
+                    <a href="login.php">Login</a>
+                    <a href="signup.php">Sign Up</a>
+                    <a href="support.php">Customer Suppport</a>
+                    <a href="contact_us.php">Contact Us</a>
+                </div>
+            </div>
         <?php endif; ?>
     </nav>
 </header>

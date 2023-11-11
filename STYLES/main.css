@@ -341,23 +341,39 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   padding: 10px;
 }
 
+.chat-message-container {
+  display: flex;
+  width: 100%;
+}
+
+.user-message-container {
+  justify-content: flex-end; /* Align user messages to the right */
+}
+
+.recipient-message-container {
+  justify-content: flex-start; /* Align recipient messages to the left */
+}
+
 .chat-message {
-  margin: 5px 0;
+  margin-bottom: 10px;
   padding: 10px;
   border-radius: 8px;
   background-color: var(--modal-bg);
   border: 1px solid var(--input-border);
+  max-width: 50%; /* Limit width to half of the chat window */
 }
 
 .user-message {
-  align-self: flex-end;
   background-color: var(--button-bg);
   color: white;
+  text-align: right;
 }
 
 .recipient-message {
-  align-self: flex-start;
+  background-color: var(--modal-bg);
+  text-align: left;
 }
+
 
 .message-input-area {
   padding: 10px;
@@ -372,8 +388,8 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   align-items: center;
   padding: 10px;
   margin-bottom: 10px;
-  background-color: var(--modal-bg);
-  border-radius: 8px;
+  background-color: var(--background-color);
+  border-radius: 0px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -381,7 +397,7 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   width: 40px; /* Adjust size as needed */
   height: 40px; /* Adjust size as needed */
   border-radius: 50%; /* Circular shape */
-  margin-right: 10px;
+  margin-right: 20px;
   object-fit: cover; /* Ensures the image is not distorted */
 }
 
