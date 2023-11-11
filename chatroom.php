@@ -40,116 +40,6 @@ $characterDetails = getCharacterById($characterID);
     <title>Dating.AI - Chatroom</title>
     <?php include "head.php"; ?>
 
-    <style>
-        /* Existing styles from main.css and bootstrap.min.css */
-
-        /* Chatroom Container Styles */
-        .chatroom-container {
-            display: flex;
-            height: 100vh; /* Full viewport height */
-            background-color: #343a40; /* Bootstrap dark background color */
-        }
-
-        /* Sidebar Styles */
-        .chat-sidebar {
-            width: 750px; /* Increased width for the sidebar */
-            border-right: 1px solid #495057; /* Bootstrap dark border color */
-            overflow-y: auto;
-            background-color: #343a40; /* Bootstrap dark background color */
-            padding: 0;
-            margin: 0;
-        }
-
-        .chat-sidebar-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            border-bottom: 1px solid #495057; /* Bootstrap dark border color */
-            cursor: pointer;
-            color: #adb5bd; /* Bootstrap dark text color */
-        }
-
-        .chat-sidebar-item:hover {
-            background-color: #495057; /* Bootstrap dark hover color */
-        }
-
-        .chat-sidebar-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .chat-sidebar-name {
-            flex: 1;
-            font-weight: bold;
-        }
-
-        /* Chat Content Styles */
-        .chat-content {
-            flex-grow: 1;
-            padding: 15px;
-            background-color: #343a40; /* Bootstrap dark background color */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        /* Chat Message Styles */
-        .chat-message {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            max-width: 60%;
-            clear: both;
-            color: #adb5bd; /* Bootstrap dark text color */
-        }
-        .chat-area{
-             scroll-behavior: smooth;
-        }
-
-        .user-message {
-            background-color: #495057; /* Bootstrap dark user message color */
-            float: right;
-        }
-
-        .recipient-message {
-            background-color: #212529; /* Bootstrap dark recipient message color */
-            float: left;
-        }
-
-        /* Message Input Area Styles */
-        .message-input-area {
-            display: flex;
-            background-color: #495057; /* Bootstrap dark input area color */
-            padding: 10px;
-            border-top: 1px solid #adb5bd; /* Bootstrap dark border color */
-        }
-
-        #message-input {
-            flex-grow: 0.8; /* 80% width */
-            padding: 10px;
-            border-radius: 20px;
-            border: none;
-            margin-right: 10px;
-            background-color: #343a40; /* Bootstrap dark input background color */
-            color: #adb5bd; /* Bootstrap dark text color */
-        }
-
-        button {
-            background-color: #007bff; /* Bootstrap primary button color */
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3; /* Bootstrap primary button hover color */
-        }
-    </style>
-
     <script>
         function loadChat(characterID) {
             window.location.href = 'chatroom.php?user_id=<?php echo $userId; ?>&character_id=' + characterID;
@@ -200,17 +90,24 @@ $characterDetails = getCharacterById($characterID);
 </body>
 </html>
 <script>
-    // Function to scroll to the bottom of the chat area
-    function scrollToBottom() {
-        var chatArea = document.querySelector('.chat-area');
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
+// Function to scroll to the bottom of the chat area
+function scrollToBottom() {
+    var chatArea = document.querySelector('.chat-area');
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
 
-    // Using MutationObserver to detect changes in the chat area
-    window.onload = function() {
-        var observer = new MutationObserver(scrollToBottom);
-        var config = { childList: true };
-        var target = document.querySelector('.chat-area');
-        observer.observe(target, config);
-    }
+// Scroll to bottom on page load
+window.onload = scrollToBottom;
+
+// MutationObserver to detect changes in the chat area and scroll
+var observer = new MutationObserver(scrollToBottom);
+var config = { childList: true };
+var target = document.querySelector('.chat-area');
+observer.observe(target, config);
+
+// Ensure scrolling after sending a message
+document.querySelector('.message-input-area form').addEventListener('submit', function() {
+    setTimeout(scrollToBottom, 500); // Delay to allow for message rendering
+});
+
 </script>

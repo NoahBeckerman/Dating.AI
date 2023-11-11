@@ -1,238 +1,246 @@
-/* Detailed and Modular CSS for Dating.AI with Dark Theme */
+/* Global CSS Variables */
+:root {
+  --primary-color: #007bff; /* Primary color for the website */
+  --secondary-color: #6c757d; /* Secondary color */
+  --background-color: #f4f4f4; /* Background color */
+  --text-color: #333; /* Primary text color */
+  --header-footer-bg: #fff; /* Background color for header and footer */
+  --modal-bg: #fefefe; /* Background color for modals */
+  --modal-overlay: rgba(0,0,0,0.4); /* Overlay color for modals */
+  --button-bg: #007bff; /* Background color for buttons */
+  --button-bg-hover: #0056b3; /* Hover state color for buttons */
+  --input-bg: #fff; /* Background color for input fields */
+  --input-border: #ccc; /* Border color for input fields */
+  --navbar-bg: #343a40; /* Background color for navbar */
+  --navbar-text: #f8f9fa; /* Text color for navbar */
+}
 
 /* Global Styles */
 body {
-    font-family: 'Helvetica Neue', sans-serif;
-    background-color: #121212;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Header Styles */
-  header {
-    background-color: #1e1e1e;
-    color: #ffffff;
-    padding: 20px;
-  }
-  
-  header h1, header h2, header h3 {
-    margin: 0;
-  }
-  
-  /* Navigation Styles */
-  nav ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  nav ul li {
-    display: inline;
-    margin-right: 10px;
-  }
-  
-  nav ul li a {
-    color: #ffffff;
-    text-decoration: none;
-  }
-  
-  /* Main Content Styles */
-  main {
-    padding: 20px;
-  }
-  
-  /* Footer Styles */
-  footer {
-    background-color: #1e1e1e;
-    color: #ffffff;
-    padding: 20px;
-    text-align: center;
-  }
-  
-  /* Chatroom Styles */
-  .chatroom {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .chat-sidebar {
-    width: 30%;
-    background-color: #1e1e1e;
-  }
-  
-  .chat-main {
-    width: 70%;
-    background-color: #121212;
-  }
-  
-  /* Admin Dashboard Styles */
-  .admin-dashboard {
-    background-color: #121212;
-  }
-  
-  /* Button Styles */
-  .btn-primary, .btn-secondary, .btn-tertiary {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .btn-primary {
-    background-color: #0f62fe;
-    color: #ffffff;
-  }
-  
-  .btn-secondary {
-    background-color: #e0e0e0;
-    color: #121212;
-  }
-  
-  .btn-tertiary {
-    background-color: #ffffff;
-    color: #121212;
-  }
-  
-  /* Form Styles */
-  input[type='text'], input[type='password'], input[type='email'], select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0 20px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #1e1e1e;
-    color: #ffffff;
-  }
-  
-  /* Error Message Styles */
-  .error-message, .warning-message, .info-message {
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
-  }
-  
-  .error-message {
-    background-color: #ff0000;
-    color: #ffffff;
-  }
-
-  .error-message-invalid-login {
-    color: red;
-    font-weight: bold;
-}
-  
-  .warning-message {
-    background-color: #ffcc00;
-    color: #121212;
-  }
-  
-  .info-message {
-    background-color: #00ccff;
-    color: #121212;
-  }
-  
-  .popup {
-    display: none;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-  }
-
-  .popup.show {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: fadeIn 1s;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  .popup-header {
-    border-top: 3px solid red;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .popup-title {
-    font-weight: bold;
-  }
-
-  .popup-type {
-    font-size: 0.8em;
-    margin-right: 10px;
-  }
-
-  .popup-message {
-    text-align: center;
-    margin: 10px 0;
-  }
-
-  .popup-close {
-    cursor: pointer;
-  }
-
-  /* Ensures uniform box sizes and image dimensions */
-.lobby-card {
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  padding: 20px; 
-  border-radius: 25px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
 }
 
-.lobby-card-img-top {
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--button-bg-hover);
+}
+
+/* Header Styles */
+header.site-header {
+  background-color: var(--header-footer-bg);
+  color: var(--text-color);
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: fixed;
   width: 100%;
-  height: 60%;
-  object-fit: cover;
+  top: 0;
+  z-index: 1000;
 }
 
-.lobby-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+/* Navigation Styles */
+nav.navbar {
+  background-color: var(--navbar-bg);
+  color: var(--navbar-text);
 }
 
-/* Improves text visibility */
-.lobby-card-title, .lobby-card-text {
-  color: #333; /* Changed from white to dark gray for visibility */
+nav.navbar .navbar-brand {
+  color: var(--navbar-text);
 }
 
-.login-container {
+nav.navbar ul.navbar-nav {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
-.login-form {
-  background-color: #1e1e1e;
+nav.navbar ul.navbar-nav li.nav-item {
+  margin: 0 10px;
+}
+
+nav.navbar ul.navbar-nav li.nav-item a.nav-link {
+  color: var(--navbar-text);
+  padding: 10px;
+}
+
+/* Responsive Navbar Toggle */
+.navbar-toggler {
+  border-color: var(--navbar-text);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(248, 249, 250, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Main Content Styles */
+main {
+  padding: 80px 20px 20px; /* Adjusted for fixed header */
+}
+
+/* Footer Styles */
+footer {
+  background-color: var(--header-footer-bg);
+  color: var(--text-color);
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px #000;
+  text-align: center;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+  position: relative;
+  bottom: 0;
+  width: 100%;
 }
 
-.btn-login {
-  background-color: #0f62fe;
-  color: #ffffff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
+footer p {
+  margin: 0;
+}
+
+/* Popup Box Styles (Modal) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: var(--modal-overlay); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: var(--modal-bg);
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
   cursor: pointer;
 }
 
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+/* Additional Utility Classes */
+.bg-light {
+  background-color: #f8f9fa;
+}
+
+.bg-dark {
+  background-color: #343a40;
+  color: white;
+}
+
+.text-dark {
+  color: #343a40;
+}
+
+.text-light {
+  color: #f8f9fa;
+}
+
+/* Custom Scrollbar for Chat Sidebar */
+.chat-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+}
+
+.chat-sidebar::-webkit-scrollbar-track {
+  background-color: #f8f9fa;
+}
+
+/* Additional Styling for Modern Look */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  overflow: hidden;
+}
+
+.card {
+  background: var(--input-bg);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Button Styles */
+button {
+  background-color: var(--button-bg);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+button:hover {
+  background-color: var(--button-bg-hover);
+}
+
+/* Form Styles */
+input[type='text'], input[type='password'], input[type='email'], select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chatroom-container {
+      flex-direction: column;
+  }
+
+  .chat-sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+  }
+
+  .chat-main {
+      width: 100%;
+  }
+}
+
+
+/* Additional Comments for Clarity */
+/* The CSS above is designed to provide a modern and user-friendly interface for your website. The use of CSS variables allows for easy theme customization, enabling users to select different color templates. The styles are meticulously crafted to ensure a seamless and responsive experience across various devices, with special attention to the chatroom layout, mimicking WhatsApp Web. The utility classes and modal styles are included for enhanced flexibility and user interaction. */
