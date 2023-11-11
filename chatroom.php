@@ -49,7 +49,7 @@ $characterDetails = getCharacterById($characterID);
 <body>
 <?php include "header.php"; ?>
 
-<main class="chatroom-container" style="overflow-y: false;">
+<main class="chatroom-container">
 <div class="chat-sidebar">
     <?php
     $previousChats = getPreviousChats($userId);
@@ -70,7 +70,7 @@ $characterDetails = getCharacterById($characterID);
         <div class="chat-header">
             <h2><?php echo $characterDetails["first_name"] . " " . $characterDetails["last_name"]; ?></h2>
         </div>
-        <div class="chat-area" style="max-height: 500px; overflow-y: false;">
+        <div class="chat-area" style="">
             <?php
             $chatMessages = getChatMessages($userId, $characterID);
             foreach ($chatMessages as $message) {

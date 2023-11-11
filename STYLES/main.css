@@ -82,16 +82,18 @@ nav.navbar ul.navbar-nav li.nav-item a.nav-link {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(248, 249, 250, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
-/* Main Content Styles */
 main {
-  padding: 80px 20px 20px; /* Adjusted for fixed header */
+  padding-top: 54px; /* Height of the header, adjust as needed */
+  height: calc(100vh - 54px - 66px); /* Replace X with your header's height */
+  margin: 0;
+  overflow-y: auto; /* Add scroll if content overflows */
 }
 
 /* Footer Styles */
 footer {
   background-color: var(--header-footer-bg);
   color: var(--text-color);
-  padding: 20px;
+  padding: 10px;
   text-align: center;
   box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
   position: relative;
@@ -227,7 +229,7 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
 /* Chatroom Styles */
 .chatroom-container {
   display: flex;
-  height: calc(100vh - 120px); /* Adjust for header and footer */
+  height: calc(100vh - 54px - 66px); /* Replace X with your header's height */
   background-color: var(--background-color);
   overflow: hidden;
 }
@@ -254,7 +256,7 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
 
 .chat-area {
   flex-grow: 1;
-  overflow-y: auto;
+  overflow-x: hidden; /* Hide horizontal scrollbar */
   padding: 10px;
 }
 

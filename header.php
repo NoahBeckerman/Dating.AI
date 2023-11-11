@@ -41,3 +41,8 @@
         </div>
     </nav>
 </header>
+
+<script>
+//  var headerHeight = document.querySelector('header').offsetHeight;
+//console.log(headerHeight);
+</script>
