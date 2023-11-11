@@ -49,24 +49,28 @@ $characterDetails = getCharacterById($characterID);
 <body>
 <?php include "header.php"; ?>
 
-<main class="chatroom-container" style="max-height: 1000px; overflow-y: auto;">
-    <div class="chat-sidebar">
-        <?php
-        $previousChats = getPreviousChats($userId);
-        foreach ($previousChats as $chat) {
-            echo '<div class="chat-sidebar-item" onclick="loadChat(' . $chat["characters_id"] . ')">';
-            echo '<img src="' . $chat["profile_picture"] . '" alt="Avatar" class="chat-sidebar-avatar">';
-            echo '<span class="chat-sidebar-name">' . $chat["first_name"] . ' ' . $chat["last_name"] . '</span>';
-            echo '</div>';
-        }
-        ?>
-    </div>
+<main class="chatroom-container" style="overflow-y: false;">
+<div class="chat-sidebar">
+    <?php
+    $previousChats = getPreviousChats($userId);
+    foreach ($previousChats as $chat) {
+        echo '<div class="profile-card" onclick="loadChat(' . $chat["characters_id"] . ')">';
+        echo '<img src="' . $chat["profile_picture"] . '" alt="Avatar" class="profile-picture">';
+        echo '<div class="profile-info">';
+        echo '<div class="profile-name">' . $chat["first_name"] . ' ' . $chat["last_name"] . '</div>';
+        echo '<div class="profile-status">Status Message</div>'; // Replace 'Status Message' with actual status if available
+        echo '</div>';
+        echo '</div>';
+    }
+    ?>
+</div>
+
 
     <div class="chat-content">
         <div class="chat-header">
             <h2><?php echo $characterDetails["first_name"] . " " . $characterDetails["last_name"]; ?></h2>
         </div>
-        <div class="chat-area" style="max-height: 500px; overflow-y: auto;">
+        <div class="chat-area" style="max-height: 500px; overflow-y: false;">
             <?php
             $chatMessages = getChatMessages($userId, $characterID);
             foreach ($chatMessages as $message) {

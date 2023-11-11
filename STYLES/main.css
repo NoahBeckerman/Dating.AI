@@ -171,7 +171,7 @@ footer p {
 
 /* Custom Scrollbar for Chat Sidebar */
 .chat-sidebar::-webkit-scrollbar {
-  width: 6px;
+  width: 60px;
 }
 
 .chat-sidebar::-webkit-scrollbar-thumb {
@@ -224,21 +224,112 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   color: var(--text-color);
 }
 
-/* Responsive Design */
+/* Chatroom Styles */
+.chatroom-container {
+  display: flex;
+  height: calc(100vh - 120px); /* Adjust for header and footer */
+  background-color: var(--background-color);
+  overflow: hidden;
+}
+
+.chat-sidebar {
+  width: 30%;
+  background-color: var(--navbar-bg);
+  color: var(--navbar-text);
+  overflow-y: auto;
+}
+
+.chat-content {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--input-bg);
+}
+
+.chat-header {
+  padding: 10px;
+  background-color: var(--header-footer-bg);
+  border-bottom: 1px solid var(--input-border);
+}
+
+.chat-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.chat-message {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: var(--modal-bg);
+  border: 1px solid var(--input-border);
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: var(--button-bg);
+  color: white;
+}
+
+.recipient-message {
+  align-self: flex-start;
+}
+
+.message-input-area {
+  padding: 10px;
+  background: var(--header-footer-bg);
+  border-top: 1px solid var(--input-border);
+}
+
+/* Responsive Design Adjustments */
 @media (max-width: 768px) {
   .chatroom-container {
-      flex-direction: column;
+    flex-direction: column;
   }
 
   .chat-sidebar {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid #ddd;
+    width: 100%;
+    order: 2; /* Sidebar moves below chat content */
   }
 
-  .chat-main {
-      width: 100%;
+  .chat-content {
+    width: 100%;
+    order: 1;
   }
+}
+
+/* Profile Card Styles */
+.profile-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: var(--modal-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.profile-picture {
+  width: 40px; /* Adjust size as needed */
+  height: 40px; /* Adjust size as needed */
+  border-radius: 50%; /* Circular shape */
+  margin-right: 10px;
+  object-fit: cover; /* Ensures the image is not distorted */
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.profile-name {
+  color: var(--text-color); /* This will apply the primary text color */
+  font-weight: bold;
+}
+
+.profile-status {
+  font-size: 0.8em;
+  color: var(--secondary-color);
 }
 
 
