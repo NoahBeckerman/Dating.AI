@@ -231,13 +231,81 @@ button:hover {
 /* Form Styles */
 input[type='text'], input[type='password'], input[type='email'], select, textarea {
   width: 100%;
-  padding: 10px;
   margin: 5px 0;
+  border: 2px solid var(--input-border);
+  padding: 10px 15px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
   border: 1px solid var(--input-border);
   border-radius: 5px;
   background-color: var(--input-bg);
   color: var(--text-color);
 }
+
+.password-container {
+  position: relative;
+  display: inline-block;
+}
+
+.password-container input {
+  padding-right: 30px; /* Make space for the icon */
+  padding-bottom: 0px;
+  /* Other styling as needed */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 70%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  /* Style as needed */
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  
+}
+
+.login-form {
+  margin: 20px;
+  padding: 20px;
+  background-color: var(--modal-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.login-form h2 {
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+
+.btn-login {
+  background-color: var(--button-bg);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-login:hover {
+  background-color: var(--button-bg-hover);
+}
+
 
 /* Chatroom Styles */
 .chatroom-container {
@@ -401,6 +469,13 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
 
   .profile-dropdown {
     order: 3;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-form {
+    width: 90%;
+    margin: 10px;
   }
 }
 

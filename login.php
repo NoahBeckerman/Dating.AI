@@ -79,8 +79,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <form action="login.php" method="POST">
             <label for="username_or_email">Username or Email:</label>
             <input type="text" id="username_or_email" name="username_or_email" required><br>
+            <div class="password-container">
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br>
+            <input type="password" id="password" name="password" required>  
+            <span onclick="togglePasswordVisibility()" class="toggle-password">&#128065;</span> <!-- Eye icon -->
+</div>
+<br>
+            
             <input type="submit" value="Sign In" class="btn-login">
         </form>
         <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
@@ -91,3 +96,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <?php include "footer.php"; ?> <!-- Include the footer -->
 </body>
 </html>
+
+<script src="SCRIPTS/auth.js"></script>
