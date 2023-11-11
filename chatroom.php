@@ -55,10 +55,10 @@ $characterDetails = getCharacterById($characterID);
     $previousChats = getPreviousChats($userId);
     foreach ($previousChats as $chat) {
         echo '<div class="profile-card" onclick="loadChat(' . $chat["characters_id"] . ')">';
-        echo '<img src="' . $chat["profile_picture"] . '" alt="Avatar" class="profile-picture">';
-        echo '<div class="profile-info">';
-        echo '<div class="profile-name">' . $chat["first_name"] . ' ' . $chat["last_name"] . '</div>';
-        echo '<div class="profile-status">Status Message</div>'; // Replace 'Status Message' with actual status if available
+        echo '<img src="' . $chat["profile_picture"] . '" alt="Avatar" class="character-picture">';
+        echo '<div class="character-info">';
+        echo '<div class="character-name">' . $chat["first_name"] . ' ' . $chat["last_name"] . '</div>';
+        echo '<div class="character-status">Status Message</div>'; // Replace 'Status Message' with actual status if available
         echo '</div>';
         echo '</div>';
     }

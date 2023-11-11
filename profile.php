@@ -184,121 +184,122 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <?php include "head.php"; ?> <!-- Include the styling/scripts -->
 
   </head>
-  <body> <?php include "header.php"; ?> <div class="container mt-5 bg-dark text-white">
-      <h1 class="text-center">Your Profile</h1>
-      <div id="accordion">
-        <div class="card bg-secondary">
-          <div class="card-header">
-            <a class="card-link text-white" data-toggle="collapse" href="#collapseOne"> Account Information </a>
-          </div>
-          <div id="collapseOne" class="collapse show" data-parent="#accordion">
-            <div class="card-body">
-              <form action="profile.php" method="post" enctype="multipart/form-data" class="form-signin">
-                 Username <input type="text" name="username" class="form-control" placeholder="Username" value="<?php echo htmlspecialchars(
-                     $user["username"]
-                 ); ?>"> 
-                 Email <input type="email" name="email" class="form-control" placeholder="Email" value="<?php echo htmlspecialchars(
-                     $user["email"]
-                 ); ?>"> 
-                 Password <input type="password" name="password" class="form-control" placeholder="Password">
-                 Age <input type="text" name="age" class="form-control" placeholder="" value="<?php echo htmlspecialchars(
-                     $user["age"]
-                 ); ?>" > 
-                 Preferences <input type="text" name="preferences" class="form-control" placeholder="" value="<?php echo htmlspecialchars(
-                     $user["preferences"]
-                 ); ?>"> 
-                  Profile Picture <div class="custom-file">
-                  <?php if ($mostRecentPic): ?>
-                 <div class="mb-3">
-                    <label>Current Profile Picture:</label>
-                    <img src="<?php echo $mostRecentPic; ?>" alt="Current Profile Picture" width="100">
-                  </div>
-                  <?php endif; ?>
-                  <input type="file" name="profile_picture" id="profile_picture">                 
-                </div>
-                <br>
-                <br>
-                <button type="submit" name="update_account" class="btn btn-primary">Update Account</button>
-              </form>
-            </div>
-          </div>
-        </div>
-        <!-- Billing Information -->
-        <div class="card bg-secondary">
-          <div class="card-header">
-            <a class="card-link text-white" data-toggle="collapse" href="#collapseTwo"> Billing Information </a>
-          </div>
-          <div id="collapseTwo" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-              <form action="profile.php" method="post" class="form-signin"> 
-                Address Line 1 <input type="text" name="addr1" class="form-control" placeholder="Address Line 1" value="<?php echo htmlspecialchars(
-                    $user["addr1"]
-                ); ?>">
-               Address Line 2 <input type="text" name="addr2" class="form-control" placeholder="Address Line 2" value="<?php echo htmlspecialchars(
-                   $user["addr2"]
-               ); ?>"> 
-               ZIP Code <input type="text" name="zip" class="form-control" placeholder="ZIP Code" value="<?php echo htmlspecialchars(
-                   $user["zip"]
-               ); ?>">
-                State <input type="text" name="state" class="form-control" placeholder="State" value="<?php echo htmlspecialchars(
-                    $user["state"]
-                ); ?>">
-                 Country <input type="text" name="country" class="form-control" placeholder="Country" value="<?php echo htmlspecialchars(
-                     $user["country"]
-                 ); ?>"> 
-                 First Name <input type="text" name="first_name" class="form-control" placeholder="First Name" value="<?php echo htmlspecialchars(
-                     $user["first_name"]
-                 ); ?>"> 
-                 Last Name <input type="text" name="last_name" class="form-control" placeholder="Last Name" value="<?php echo htmlspecialchars(
-                     $user["last_name"]
-                 ); ?>">
-                <button type="submit" name="update_billing" class="btn btn-primary">Update Billing</button>
-              </form>
-            </div>
-          </div>
-        </div>
-        <!-- Subscription Information -->
-        <div class="card bg-secondary">
-          <div class="card-header">
-            <a class="card-link text-white" data-toggle="collapse" href="#collapseThree"> Subscription Information </a>
-          </div>
-          <div id="collapseThree" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-              <!-- Placeholder for Subscription Information -->
-            </div>
-          </div>
-        </div>
-        <!-- Statistics -->
-        <div class="card bg-secondary">
-          <div class="card-header">
-            <a class="card-link text-white" data-toggle="collapse" href="#collapseFour"> Statistics </a>
-          </div>
-          <div id="collapseFour" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-              <!-- Placeholder for Statistics -->
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of Accordion -->
-    </div>
+  <body> <?php include "header.php"; ?> <div class="profile-tiles">
+  
+  <!-- User Information Tile -->
+  <div class="tile">
+  <div class="tile-header">User Information</div>
+  <div class="tile-content">
+    <form action="profile.php" method="post" enctype="multipart/form-data" class="form-signin">
+       <div class="form-group">
+         <label for="username">Username</label>
+         <input type="text" id="username" name="username" class="form-control" placeholder="Username" value="<?php echo htmlspecialchars($user["username"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="email">Email</label>
+         <input type="email" id="email" name="email" class="form-control" placeholder="Email" value="<?php echo htmlspecialchars($user["email"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="password">Password</label>
+         <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+       </div>
+       
+       <div class="form-group">
+         <label for="age">Age</label>
+         <input type="text" id="age" name="age" class="form-control" placeholder="Age" value="<?php echo htmlspecialchars($user["age"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="preferences">Preferences</label>
+         <input type="text" id="preferences" name="preferences" class="form-control" placeholder="Preferences" value="<?php echo htmlspecialchars($user["preferences"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="profile_picture">Profile Picture</label>
+         <?php if ($mostRecentPic): ?>
+           <div class="tile-img-container">
+             <img src="<?php echo $mostRecentPic; ?>" alt="Current Profile Picture" class="tile-img-thumbnail">
+           </div>
+         <?php endif; ?>
+         <input type="file" id="profile_picture" name="profile_picture" class="form-control-file">
+       </div>
+       
+       <button type="submit" name="update_account" class="btn btn-primary">Update Account</button>
+    </form>
+  </div>
+</div>
 
-<?php include "modal.php"; ?>
+  
+  <!-- Billing Information Tile -->
+  <div class="tile">
+  <div class="tile-header">Billing Information</div>
+  <div class="tile-content">
+    <form action="profile.php" method="post" class="form-signin">
+       <div class="form-group">
+         <label for="addr1">Address Line 1</label>
+         <input type="text" id="addr1" name="addr1" class="form-control" placeholder="Address Line 1" value="<?php echo htmlspecialchars($user["addr1"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="addr2">Address Line 2</label>
+         <input type="text" id="addr2" name="addr2" class="form-control" placeholder="Address Line 2" value="<?php echo htmlspecialchars($user["addr2"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="zip">ZIP Code</label>
+         <input type="text" id="zip" name="zip" class="form-control" placeholder="ZIP Code" value="<?php echo htmlspecialchars($user["zip"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="state">State</label>
+         <input type="text" id="state" name="state" class="form-control" placeholder="State" value="<?php echo htmlspecialchars($user["state"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="country">Country</label>
+         <input type="text" id="country" name="country" class="form-control" placeholder="Country" value="<?php echo htmlspecialchars($user["country"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="first_name">First Name</label>
+         <input type="text" id="first_name" name="first_name" class="form-control" placeholder="First Name" value="<?php echo htmlspecialchars($user["first_name"]); ?>">
+       </div>
+       
+       <div class="form-group">
+         <label for="last_name">Last Name</label>
+         <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Last Name" value="<?php echo htmlspecialchars($user["last_name"]); ?>">
+       </div>
+       
+       <button type="submit" name="update_billing" class="btn btn-primary">Update Billing</button>
+    </form>
+  </div>
+</div>
+
+  
+  <!-- Subscription Information Tile -->
+  <div class="tile">
+    <div class="tile-header">Subscription Information</div>
+    <div class="tile-content">
+      <!-- Subscription information content goes here -->
+    </div>
+  </div>
+  
+  <!-- Statistics Tile -->
+  <div class="tile">
+    <div class="tile-header">Statistics</div>
+    <div class="tile-content">
+      <!-- Statistics content goes here -->
+    </div>
+  </div>
+
+</div>
+<?php //include "modal.php"; ?>
 
 
 <form action="profile.php" method="post" class="mt-3">
     <button type="submit" name="clear_chat_history" class="btn btn-lg btn-danger btn-block">Clear Chat History</button>
 </form>
-
-<?php include "footer.php"; ?>
-
-
 </body>
 </html>
-
-<script>
-    document.getElementById('profile_picture').addEventListener('change', function() {
-        var fileName = this.files[0].name;
-        document.getElementById('fileLabel').textContent = fileName;
-    });
-</script>

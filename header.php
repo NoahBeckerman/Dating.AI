@@ -12,7 +12,7 @@
         <!-- Navigation Links -->
         <div class="navbar-nav">
             <a href="lobby.php" class="nav-link">Character Selection</a>
-            <a href="custom.php" class="nav-link">Character Creator</a>
+            <!-- <a href="custom.php" class="nav-link">Character Creator</a> -->
             <a href="chatroom.php" class="nav-link">Chatroom</a>
         </div>
 
