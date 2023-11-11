@@ -22,12 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // This part can be customized further based on your specific requirements
   });
 
-  document.getElementById('list-view-btn').addEventListener('click', function() {
+  document.getElementById('listViewButton').addEventListener('click', function() {
     document.querySelector('.character-container').classList.add('list-view');
     document.querySelector('.character-container').classList.remove('card-view');
 });
 
-document.getElementById('card-view-btn').addEventListener('click', function() {
+document.getElementById('cardViewButton').addEventListener('click', function() {
     document.querySelector('.character-container').classList.add('card-view');
     document.querySelector('.character-container').classList.remove('list-view');
 });

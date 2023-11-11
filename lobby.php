@@ -32,25 +32,55 @@ if (isset($_POST["character_ID"])) {
             <button id="cardViewButton" class="btn btn-secondary">Card View</button>
         </div>
 
+      
+
         <div id="charactersContainer" class="characters-container card-view">
-            <?php
-            $characters = getCharacters();
-            foreach ($characters as $character) {
-                echo '<div class="character-card">';
-                echo '<img src="' . $character["profile_picture"] . '" class="card-img-top" alt="Profile Picture">';
-                echo '<div class="card-body">';
-                echo "<h5 class='card-title'>" . $character["first_name"] . " " . $character["last_name"] . "</h5>";
-                echo "<p class='card-text'>" . $character["bio"] . "</p>";
-                echo "<p class='card-tags'>Schedule: " . $character["availability_schedule"] . "<br>Location: " . $character["current_location"] . "<br>Age: " . $character["age"] . "</p>";
-                echo '<form method="post" action="lobby.php">';
-                echo '<input type="hidden" name="character_ID" value="' . $character["id"] . '">';
-                echo '<button type="submit" class="btn btn-primary">Chat</button>';
-                echo '</form>';
-                echo '</div>';
-                echo '</div>';
+    <?php
+    $characters = getCharacters(); // Function to fetch characters from 'users' table
+    foreach ($characters as $character) {
+        echo '<div class="character-card">';
+        echo '<img src="' . htmlspecialchars($character["profile_picture"]) . '" class="card-img-top" alt="Profile Picture">';
+        echo '<div class="card-body">';
+        echo "<h5 class='card-title'>" . htmlspecialchars($character["first_name"]) . " " . htmlspecialchars($character["last_name"]) . "</h5>";
+        echo "<p class='bio'>" . htmlspecialchars($character["bio"]) . "</p>";
+        // Display availability schedule, location, and age in bubbles
+        echo '<div class="card-tags">';
+
+        // Availability Schedule - assuming it is JSON
+        $availabilitySchedule = json_decode($character["availability_schedule"], true);
+        if ($availabilitySchedule) {
+            echo '<div class="tag-bubble">Schedule:';
+            foreach ($availabilitySchedule as $key => $value) {
+                echo '<div class="mini-bubble">' . htmlspecialchars($key) . ': ' . htmlspecialchars($value) . '</div>';
             }
-            ?>
-        </div>
+            echo '</div>'; // Close schedule bubble
+        }
+
+        // Location
+        if (!empty($character["current_location"])) {
+            echo '<div class="tag-bubble">';
+            echo 'Location: ' . htmlspecialchars($character["current_location"]);
+            echo '</div>'; // Close location bubble
+        }
+
+        // Age
+        if (!empty($character["age"])) {
+            echo '<div class="tag-bubble">';
+            echo 'Age: ' . htmlspecialchars($character["age"]);
+            echo '</div>'; // Close age bubble
+        }
+
+        echo '</div>'; // Close card-tags
+        echo '<form method="post" action="lobby.php">';
+        echo '<input type="hidden" name="character_ID" value="' . $character["id"] . '">';
+        echo '<button type="submit" class="btn btn-primary">Chat</button>';
+        echo '</form>';
+        echo '</div>'; // Close card-body
+      
+        echo '</div>'; // Close character-card
+    }
+    ?>
+</div>
     </main>
     <?php include "footer.php"; ?> <!-- Include the footer -->
   </body>

@@ -362,51 +362,120 @@ input[type='text'], input[type='password'], input[type='email'], select, textare
   border-top: 1px solid var(--input-border);
 }
 
-.character-container {
+.characters-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 20px; /* Adds space between cards */
+  justify-content: center;
+  gap: 20px; /* Adjust gap as needed */
 }
 
 .character-card {
-  flex: 0 1 calc(33.333% - 20px); /* Adjust for 3 cards per row, accounting for gap */
-  max-width: 300px; /* Adjust as needed */
-  margin: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  flex-basis: calc(33% - 20px); /* Adjust based on your layout needs */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  max-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: flex-start;
+  padding-bottom: 70px; /* Space for chat button */
 }
 
-.character-card .card-img-top {
+.character-card img, .character-card .card-img-top {
   width: 100%;
-  height: auto;
+  height: 200px;
   object-fit: cover;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.character-card .card-body {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  align-items: flex-start;
 }
 
 .character-card .card-title {
-  font-size: 1.2em; /* Adjust as needed */
+  font-size: 1.2em;
   margin-bottom: 5px;
+  margin-top: 75px;
+  margin-bottom: 10px; /* Space for tags */
+}
+
+.character-card .bio {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+  margin-bottom: 10px; /* Space for tags */
 }
 
 .character-card .card-text {
-  font-size: 0.9em; /* Adjust as needed */
+  font-size: 0.9em;
   color: #666;
+  margin-bottom: 10px; /* Space for tags */
 }
 
 .character-card .card-tags {
-  font-size: 0.8em;
-  color: #007bff;
-  margin-top: 10px;
+  position: absolute;
+  top: 220px; /* Adjust based on image height */
+  left: 15px;
+  right: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
 }
 
-.characters-container.list-view .character-card {
-  flex: 0 1 100%; /* Full width for list view */
-  margin-bottom: 10px;
+.tag-bubble {
+  background-color: #e1e4e8;
+  color: #24292e;
+  border-radius: 16px;
+  font-size: 12px;
+  padding: 2px 6px;
+  margin: 2px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-bubble {
+  background-color: #0366d6;
+  color: white;
+  border-radius: 12px;
+  padding: 0 4px;
+  margin-left: 5px;
+  height: 18px;
+  line-height: 18px;
+}
+
+.character-card form {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.character-card .btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .view-toggle button {
-  padding: 5px 10px;
-  margin: 10px;
-  cursor: pointer;
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+
+.view-toggle button.active, .view-toggle button:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 /* Profile Card Styles */
