@@ -85,7 +85,7 @@ header.site-header {
 }
 
 main {
-  padding-top: 54px; /* Height of the header, adjust as needed */
+  padding-top: 0px; /* Height of the header, adjust as needed */
   height: calc(100vh - 54px - 66px); /* Adjust for header/footer height */
   margin: 0;
   overflow-y: auto;
